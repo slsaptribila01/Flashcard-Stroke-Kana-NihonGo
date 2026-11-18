@@ -1,0 +1,2918 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Nihongo Kana Studio — Latihan Menulis & Flashcard Hiragana Katakana (SMA Kelas 11)</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Noto Sans JP (bersih standar buku pelajaran Jepang) & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+            jp: ['Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'sans-serif'],
+          },
+          colors: {
+            aiiro: {
+              50: '#EFF6FF',
+              100: '#DBEAFE',
+              200: '#BFDBFE',
+              600: '#2563EB',
+              800: '#1E40AF',
+              900: '#1E3A8A',
+            },
+            shuiro: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              600: '#EA580C',
+              700: '#C2410C',
+              800: '#9A3412',
+            },
+            washi: '#FAF9F6',
+            sumi: '#1E293B',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* ==========================================================================
+       ATURAN DASAR VIEWPORT & PENCEGAHAN SCROLL / GESTUR BROWSER
+       ========================================================================== */
+    :root {
+      --theme-primary: #1E3A8A;
+      --theme-primary-hover: #1E40AF;
+      --theme-light: #EFF6FF;
+      --theme-border: #BFDBFE;
+      --theme-text: #1E3A8A;
+      --theme-badge-bg: #DBEAFE;
+    }
+
+    body.theme-katakana {
+      --theme-primary: #C2410C;
+      --theme-primary-hover: #9A3412;
+      --theme-light: #FFF7ED;
+      --theme-border: #FED7AA;
+      --theme-text: #9A3412;
+      --theme-badge-bg: #FFEDD5;
+    }
+
+    html, body {
+      height: 100dvh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      overscroll-behavior: none;
+      background-color: #F4F3EF;
+      color: #1E293B;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    .jp-font {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    }
+
+    /* Utilitas Tema Dinamis */
+    .bg-theme-primary { background-color: var(--theme-primary); }
+    .hover\:bg-theme-primary-hover:hover { background-color: var(--theme-primary-hover); }
+    .bg-theme-light { background-color: var(--theme-light); }
+    .bg-theme-badge { background-color: var(--theme-badge-bg); }
+    .border-theme { border-color: var(--theme-border); }
+    .border-theme-primary { border-color: var(--theme-primary); }
+    .text-theme { color: var(--theme-text); }
+    .text-theme-primary { color: var(--theme-primary); }
+
+    /* ==========================================================================
+       3D FLASHCARD FLIP ANIMATION
+       ========================================================================== */
+    .flashcard-scene {
+      perspective: 1400px;
+      touch-action: none;
+    }
+
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .flashcard-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 1.5rem;
+      overflow: hidden;
+    }
+
+    .flashcard-back {
+      transform: rotateY(180deg);
+    }
+
+    /* ==========================================================================
+       ANIMASI STEMPEL & UMPAN BALIK
+       ========================================================================== */
+    @keyframes stampPop {
+      0% { transform: scale(2.1) rotate(-14deg); opacity: 0; }
+      65% { transform: scale(0.92) rotate(-6deg); opacity: 1; }
+      100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+    }
+
+    .animate-stamp {
+      animation: stampPop 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes errorShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    .animate-shake {
+      animation: errorShake 0.35s ease-in-out;
+    }
+
+    /* Scrollbar rapi khusus untuk area modal & filter horizontal */
+    .allow-scroll-y {
+      overflow-y: auto;
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .allow-scroll-x {
+      overflow-x: auto;
+      touch-action: pan-x;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .allow-scroll-x::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="flex flex-col h-[100dvh] w-[100vw] overflow-hidden select-none">
+
+  <!-- ========================================================================
+       1. BAR NAVIGASI UTAMA (TOP HEADER)
+       ======================================================================== -->
+  <header class="shrink-0 bg-white border-b border-slate-200 px-2.5 sm:px-4 py-1.5 sm:py-2 shadow-xs z-20">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-1.5 sm:gap-3">
+
+      <!-- Kiri: Identitas Aplikasi + Sakelar Mode Belajar -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5">
+        <div class="hidden md:flex items-center gap-2 pr-2 border-r border-slate-200">
+          <span class="w-8 h-8 rounded-xl bg-theme-primary text-white flex items-center justify-center font-jp font-bold text-base shadow-xs transition-colors">
+            日
+          </span>
+          <div class="leading-tight">
+            <h1 class="text-xs font-extrabold tracking-tight text-slate-800">NIHONGO KANA</h1>
+            <p class="text-[10px] font-medium text-slate-500">SMA Kelas 11 • A–N</p>
+          </div>
+        </div>
+
+        <!-- Sakelar Mode Belajar: Tracing vs Flashcard -->
+        <nav aria-label="Mode Belajar" class="inline-flex rounded-xl bg-slate-100 p-0.5 sm:p-1 border border-slate-200">
+          <button id="btn-mode-tracing" type="button"
+            class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <span>✍️</span>
+            <span>Latihan Menulis</span>
+          </button>
+          <button id="btn-mode-flashcard" type="button"
+            class="px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <span>🗂️</span>
+            <span>Flashcard</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tengah: Sakelar Aksara Terpisah Tegas (HIRAGANA vs KATAKANA) -->
+      <div aria-label="Pilih Jenis Aksara" class="inline-flex rounded-xl bg-slate-100 p-0.5 sm:p-1 border border-slate-200">
+        <button id="btn-script-hiragana" type="button"
+          class="px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition-all cursor-pointer">
+          <span class="jp-font text-sm sm:text-base">あ</span>
+          <span>HIRAGANA</span>
+        </button>
+        <button id="btn-script-katakana" type="button"
+          class="px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition-all cursor-pointer">
+          <span class="jp-font text-sm sm:text-base">ア</span>
+          <span>KATAKANA</span>
+        </button>
+      </div>
+
+      <!-- Kanan: Kontrol Pendukung (Tabel Gojuon, Audio, Fullscreen) -->
+      <div class="flex items-center gap-1 sm:gap-2">
+        <button id="btn-open-gojuon" type="button" title="Buka Tabel Gojuon A–N"
+          class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 border border-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition cursor-pointer">
+          <svg class="w-4 h-4 text-theme-primary" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+          </svg>
+          <span class="hidden sm:inline">Tabel Gojuon</span>
+          <span class="sm:hidden">A–N</span>
+        </button>
+
+        <button id="btn-toggle-audio" type="button" title="Aktifkan / Bisukan Suara"
+          class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 border border-slate-200 transition cursor-pointer"
+          aria-label="Toggle Audio">
+          <span id="icon-audio-on" class="block">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-theme-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
+            </svg>
+          </span>
+          <span id="icon-audio-off" class="hidden">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
+            </svg>
+          </span>
+        </button>
+
+        <button id="btn-toggle-fullscreen" type="button" title="Layar Penuh (IFP / Tablet)"
+          class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 border border-slate-200 transition cursor-pointer"
+          aria-label="Layar Penuh">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       2. AREA UTAMA APLIKASI (ADAPTIF PORTRAIT & LANDSCAPE TANPA SCROLL)
+       ======================================================================== -->
+  <main class="flex-1 min-h-0 w-full max-w-7xl mx-auto p-2 sm:p-3 lg:p-4 flex flex-col">
+
+    <!-- ======================================================================
+         TAMPILAN MODE 1: LATIHAN MENULIS (TRACING & KAKIJUN)
+         ====================================================================== -->
+    <section id="view-tracing" class="flex-1 min-h-0 w-full flex flex-col landscape:flex-row gap-2.5 sm:gap-4">
+
+      <!-- Kolom Kiri / Tengah: Kanvas Genkouyoushi Interaktif -->
+      <div class="flex-1 min-h-0 flex flex-col items-center justify-center relative">
+        <!-- Lencana Identitas Aksara di Atas Kanvas -->
+        <div class="w-full max-w-[520px] flex items-center justify-between gap-2 mb-1.5 px-1">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span id="tracing-script-badge"
+              class="shrink-0 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold tracking-wide bg-theme-badge text-theme border border-theme">
+              HIRAGANA
+            </span>
+            <span id="tracing-script-desc" class="truncate text-[11px] sm:text-xs font-medium text-slate-500">
+              Aksara Dasar & Kosakata Asli Jepang
+            </span>
+          </div>
+          <span id="tracing-counter-badge" class="shrink-0 text-xs font-bold text-slate-600 bg-white px-2.5 py-0.5 rounded-full border border-slate-200">
+            1 / 46
+          </span>
+        </div>
+
+        <!-- Wrapper Persegi Responsif untuk Kanvas -->
+        <div id="canvas-stage-wrapper" class="flex-1 min-h-0 w-full flex items-center justify-center relative">
+          <div id="canvas-box" class="relative bg-white rounded-3xl shadow-md border-2 border-theme overflow-hidden flex items-center justify-center transition-colors">
+            <canvas id="tracing-canvas" class="block touch-none cursor-crosshair"></canvas>
+
+            <!-- Banner Umpan Balik Kesalahan Goresan -->
+            <div id="tracing-feedback-banner"
+              class="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-full bg-red-600 text-white text-xs sm:text-sm font-bold shadow-lg opacity-0 transition-opacity duration-200 whitespace-nowrap z-10">
+              Perhatikan urutan & arah goresan ke-1
+            </div>
+
+            <!-- Stempel Kelulusan「よくできました！」 -->
+            <div id="tracing-stamp-overlay"
+              class="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/45 backdrop-blur-[1px] hidden z-20">
+              <div id="tracing-stamp-card"
+                class="px-5 py-3 sm:px-7 sm:py-4 rounded-2xl border-4 border-red-600 bg-white/95 text-red-600 shadow-2xl text-center">
+                <p class="jp-font text-xl sm:text-3xl font-black tracking-wider">よくできました！</p>
+                <p class="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-red-500 mt-0.5">
+                  Yoku dekimashita! • Hebat!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kolom Kanan / Bawah: Panel Info Huruf, Sub-Mode & Tombol Kontrol -->
+      <aside class="shrink-0 landscape:w-[340px] lg:landscape:w-[400px] flex flex-col justify-between gap-2 sm:gap-3 bg-white rounded-3xl border border-slate-200 p-3 sm:p-4 shadow-xs">
+
+        <!-- Baris Info Utama Huruf + Sub-Mode Latihan vs Uji -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-between gap-2">
+            <!-- Info Kana, Romaji & Jumlah Goresan -->
+            <div class="flex items-center gap-3">
+              <div id="tracing-char-preview"
+                class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-theme-light border border-theme flex items-center justify-center jp-font text-3xl sm:text-4xl font-bold text-theme-primary">
+                あ
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span id="tracing-romaji" class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">a</span>
+                  <button id="btn-tracing-speak" type="button" title="Dengarkan Pelafalan"
+                    class="p-1.5 sm:p-2 rounded-xl bg-theme-light hover:bg-theme-badge text-theme-primary border border-theme transition active:scale-95 cursor-pointer">
+                    🔊
+                  </button>
+                </div>
+                <p id="tracing-stroke-info" class="text-xs font-semibold text-slate-500">
+                  Baris A • <span class="text-theme-primary font-bold">3 Goresan</span> (Goresan 1/3)
+                </p>
+              </div>
+            </div>
+
+            <!-- Sakelar Sub-Mode: Latihan vs Mode Uji -->
+            <div class="flex flex-col items-end">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Mode Panduan</span>
+              <div class="inline-flex rounded-xl bg-slate-100 p-0.5 border border-slate-200">
+                <button id="btn-submode-practice" type="button"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer">
+                  Latihan
+                </button>
+                <button id="btn-submode-test" type="button"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer">
+                  Uji
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kartu Contoh Kosakata SMA Kelas 11 -->
+          <div class="rounded-2xl bg-theme-light/70 border border-theme p-2.5 sm:p-3 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-theme">Contoh Kosakata</span>
+                <span id="tracing-mastered-pill" class="hidden px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">
+                  ✓ Selesai Ditulis
+                </span>
+              </div>
+              <p id="tracing-vocab-jp" class="jp-font text-base sm:text-lg font-bold text-slate-800 truncate mt-0.5">
+                あさ
+              </p>
+              <p id="tracing-vocab-meaning" class="text-xs sm:text-sm font-medium text-slate-600 truncate">
+                <span class="font-semibold italic text-slate-700">asa</span> — pagi
+              </p>
+            </div>
+            <button id="btn-tracing-speak-vocab" type="button" title="Dengarkan Kosakata"
+              class="shrink-0 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-theme text-theme-primary text-xs font-bold flex items-center gap-1 shadow-2xs active:scale-95 transition cursor-pointer">
+              <span>🔊</span>
+              <span class="hidden sm:inline">Kata</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progres Baris & Keseluruhan -->
+        <div class="hidden landscape:flex flex-col gap-1.5 bg-slate-50 rounded-2xl p-3 border border-slate-200/80">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-600">
+            <span id="tracing-progress-label">Progres Menulis Hiragana</span>
+            <span id="tracing-progress-count" class="font-extrabold text-theme-primary">0 / 46 Huruf</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div id="tracing-progress-bar" class="h-full bg-theme-primary rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-0.5">
+            Ikuti titik bernomor <b>1, 2, 3...</b> sesuai arah panah.
+          </p>
+        </div>
+
+        <!-- Tombol Aksi Utama (Ramah Ibu Jari & IFP) -->
+        <div class="flex flex-col gap-2">
+          <!-- Baris Aksi Kanvas: Contoh Tulis & Ulangi -->
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-tracing-demo" type="button"
+              class="py-2.5 px-3 rounded-2xl bg-theme-light hover:bg-theme-badge text-theme-primary border border-theme font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer">
+              <span>▶️</span>
+              <span>Contoh Tulis</span>
+            </button>
+            <button id="btn-tracing-clear" type="button"
+              class="py-2.5 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer">
+              <span>↺</span>
+              <span>Ulangi</span>
+            </button>
+          </div>
+
+          <!-- Baris Navigasi Huruf: Sebelumnya & Berikutnya -->
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-tracing-prev" type="button"
+              class="py-2.5 sm:py-3 px-3 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer">
+              <span>◀</span>
+              <span>Sebelumnya</span>
+            </button>
+            <button id="btn-tracing-next" type="button"
+              class="py-2.5 sm:py-3 px-3 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition cursor-pointer">
+              <span>Berikutnya</span>
+              <span>▶</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ======================================================================
+         TAMPILAN MODE 2: FLASHCARD KANA (KARTU HAFALAN INTERAKTIF 3D)
+         ====================================================================== -->
+    <section id="view-flashcard" class="hidden flex-1 min-h-0 w-full flex flex-col gap-2 sm:gap-3">
+
+      <!-- Bar Filter Baris & Progres Dek -->
+      <div class="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white rounded-2xl border border-slate-200 px-3 py-2 shadow-2xs">
+        <!-- Filter Baris Cepat -->
+        <div id="fc-row-filters" class="allow-scroll-x flex items-center gap-1.5 py-0.5">
+          <!-- Diisi dinamis oleh JS -->
+        </div>
+
+        <!-- Indikator Progres Hafalan Dek Aktif + Reset -->
+        <div class="shrink-0 flex items-center justify-between sm:justify-end gap-2.5 border-t sm:border-t-0 pt-1.5 sm:pt-0 border-slate-100">
+          <div class="flex items-center gap-2">
+            <span id="fc-progress-text" class="text-xs font-extrabold text-theme-primary">
+              Progres Hiragana: 0/46 Hafal
+            </span>
+            <div class="w-20 sm:w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div id="fc-progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <button id="btn-fc-reset-prompt" type="button" title="Reset Progres Dek Ini"
+            class="px-2 py-1 rounded-lg text-[11px] font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition cursor-pointer">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Kontainer Tengah Kartu Flashcard + Panel Kontrol -->
+      <div class="flex-1 min-h-0 flex flex-col landscape:flex-row items-center justify-center gap-2.5 sm:gap-5">
+
+        <!-- Area Kartu 3D (Mendukung Ketuk Flip & Swipe Kiri/Kanan) -->
+        <div class="flex-1 min-h-0 w-full max-w-[440px] lg:max-w-[480px] h-full max-h-[480px] flex items-center justify-center">
+          <div id="flashcard-scene" class="flashcard-scene w-full h-full cursor-pointer">
+            <div id="flashcard-inner" class="flashcard-inner">
+
+              <!-- SISI DEPAN KARTU (FRONT) -->
+              <div class="flashcard-face bg-white border-2 border-theme shadow-lg flex flex-col justify-between p-4 sm:p-6">
+                <!-- Header Sisi Depan -->
+                <div class="flex items-center justify-between gap-2">
+                  <span id="fc-front-badge"
+                    class="px-3 py-1 rounded-full text-xs font-extrabold tracking-wide bg-theme-badge text-theme border border-theme">
+                    HIRAGANA • Baris A
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span id="fc-mastered-badge"
+                      class="hidden px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+                      ✅ Hafal
+                    </span>
+                    <span id="fc-card-index" class="text-xs font-bold text-slate-400">
+                      1 / 46
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Karakter Kana Ekstra Besar -->
+                <div class="flex-1 flex flex-col items-center justify-center my-2">
+                  <div id="fc-front-char"
+                    class="jp-font text-[6.5rem] sm:text-[8.5rem] leading-none font-bold text-slate-800 select-none">
+                    あ
+                  </div>
+                </div>
+
+                <!-- Footer Sisi Depan: Tombol Speaker & Petunjuk -->
+                <div class="flex flex-col items-center gap-2">
+                  <button id="btn-fc-speak-front" type="button"
+                    class="px-4 py-2 rounded-full bg-theme-light hover:bg-theme-badge text-theme-primary border border-theme text-xs sm:text-sm font-bold flex items-center gap-2 shadow-2xs active:scale-95 transition cursor-pointer">
+                    <span>🔊</span>
+                    <span>Dengarkan</span>
+                  </button>
+                  <p class="text-[11px] sm:text-xs font-medium text-slate-400 flex items-center gap-1">
+                    <span>Ketuk kartu atau tekan <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-[10px]">Spasi</kbd> untuk membalik</span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- SISI BELAKANG KARTU (BACK) -->
+              <div class="flashcard-face flashcard-back bg-white border-2 border-theme shadow-lg flex flex-col justify-between p-4 sm:p-5">
+                <!-- Header Sisi Belakang -->
+                <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                  <div>
+                    <span id="fc-back-romaji" class="text-3xl sm:text-4xl font-black text-theme-primary tracking-tight">
+                      a
+                    </span>
+                    <p id="fc-back-meta" class="text-xs font-bold text-slate-500">
+                      Hiragana • 3 Goresan
+                    </p>
+                  </div>
+
+                  <!-- Diagram Mini Urutan Goresan (Kakijun Preview) -->
+                  <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center">
+                      <canvas id="fc-mini-stroke-canvas" width="120" height="120" class="w-full h-full"></canvas>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-400 mt-0.5">Urutan Goresan</span>
+                  </div>
+                </div>
+
+                <!-- Kotak Contoh Kosakata -->
+                <div class="my-auto rounded-2xl bg-theme-light/80 border border-theme p-3 sm:p-4">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-theme">
+                      Contoh Kosakata
+                    </span>
+                    <button id="btn-fc-speak-vocab" type="button"
+                      class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-50 text-theme-primary border border-theme text-xs font-bold flex items-center gap-1 active:scale-95 transition cursor-pointer">
+                      <span>🔊</span>
+                      <span>Dengar Kata</span>
+                    </button>
+                  </div>
+                  <p id="fc-back-vocab-jp" class="jp-font text-xl sm:text-2xl font-bold text-slate-800">
+                    あさ
+                  </p>
+                  <p id="fc-back-vocab-meaning" class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                    <span class="font-bold italic text-slate-800">asa</span> — pagi
+                  </p>
+                </div>
+
+                <!-- Tombol Pintas ke Mode Tracing -->
+                <button id="btn-fc-go-tracing" type="button"
+                  class="w-full py-2.5 sm:py-3 px-4 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition cursor-pointer">
+                  <span>✍️</span>
+                  <span>Latih Tulis Huruf Ini</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel Navigasi & Evaluasi Mandiri Flashcard -->
+        <div class="shrink-0 w-full max-w-[440px] landscape:w-[300px] lg:landscape:w-[340px] flex flex-col gap-2 bg-white rounded-3xl border border-slate-200 p-3 sm:p-4 shadow-xs">
+
+          <!-- Status Dek Aktif -->
+          <div class="hidden landscape:block pb-2 border-b border-slate-100">
+            <span id="fc-side-script-label" class="text-xs font-extrabold uppercase tracking-wider text-theme">
+              DEK HIRAGANA
+            </span>
+            <p id="fc-side-script-desc" class="text-xs text-slate-500 mt-0.5">
+              Aksara Dasar & Kosakata Asli Jepang
+            </p>
+          </div>
+
+          <!-- Tombol Evaluasi Mandiri: Belum Hafal vs Sudah Hafal -->
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-fc-unmastered" type="button"
+              class="py-2.5 px-3 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer">
+              <span>❌</span>
+              <span>Belum Hafal</span>
+            </button>
+            <button id="btn-fc-mastered" type="button"
+              class="py-2.5 px-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer">
+              <span>✅</span>
+              <span>Sudah Hafal</span>
+            </button>
+          </div>
+
+          <!-- Tombol Navigasi Kartu & Acak -->
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btn-fc-prev" type="button"
+              class="py-2.5 px-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-1 active:scale-95 transition cursor-pointer">
+              <span>◀</span>
+              <span>Sblm</span>
+            </button>
+            <button id="btn-fc-shuffle" type="button"
+              class="py-2.5 px-2 rounded-2xl bg-theme-light hover:bg-theme-badge text-theme-primary border border-theme font-bold text-xs sm:text-sm flex items-center justify-center gap-1 active:scale-95 transition cursor-pointer">
+              <span>🔀</span>
+              <span>Acak</span>
+            </button>
+            <button id="btn-fc-next" type="button"
+              class="py-2.5 px-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-1 active:scale-95 transition cursor-pointer">
+              <span>Brkt</span>
+              <span>▶</span>
+            </button>
+          </div>
+
+          <p class="text-center text-[11px] text-slate-400">
+            Geser (swipe) kartu ke kiri/kanan untuk berpindah
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       3. MODAL TABEL GOJUON LENGKAP (A–N / 46 HURUF)
+       ======================================================================== -->
+  <div id="modal-gojuon" class="fixed inset-0 z-40 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white w-full max-w-4xl max-h-[90dvh] rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden">
+
+      <!-- Header Modal Gojuon -->
+      <div class="shrink-0 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 bg-slate-50">
+        <div class="flex items-center gap-2.5">
+          <h2 class="text-base sm:text-lg font-extrabold text-slate-800">Tabel Gojuon (A–N)</h2>
+          <!-- Tab Pemisah Hiragana vs Katakana di dalam Modal -->
+          <div class="inline-flex rounded-xl bg-slate-200/80 p-0.5">
+            <button id="btn-modal-tab-hiragana" type="button"
+              class="px-3 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer">
+              あ Hiragana
+            </button>
+            <button id="btn-modal-tab-katakana" type="button"
+              class="px-3 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer">
+              ア Katakana
+            </button>
+          </div>
+        </div>
+
+        <button id="btn-close-gojuon" type="button"
+          class="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition cursor-pointer">
+          ✕ Tutup
+        </button>
+      </div>
+
+      <!-- Keterangan Warna & Status -->
+      <div class="shrink-0 px-4 py-2 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+        <span>Ketuk huruf mana saja untuk langsung berlatih menulis atau membuka kartu.</span>
+        <div class="flex items-center gap-3">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span> Tulis Selesai</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Flashcard Hafal</span>
+        </div>
+      </div>
+
+      <!-- Grid Tabel Gojuon 10 Baris x 5 Vokal (a, i, u, e, o) -->
+      <div id="gojuon-grid-container" class="flex-1 allow-scroll-y p-3 sm:p-4 space-y-2">
+        <!-- Diisi dinamis oleh JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       4. MODAL KONFIRMASI RESET PROGRES (PENGGANTI CONFIRM() BAWAAN)
+       ======================================================================== -->
+  <div id="modal-reset-confirm" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-slate-200 p-5 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-2xl mx-auto mb-3">
+        ↺
+      </div>
+      <h3 class="text-base font-extrabold text-slate-800">Reset Progres Hafalan?</h3>
+      <p id="reset-confirm-desc" class="text-xs sm:text-sm text-slate-600 mt-1.5">
+        Semua status "Sudah Hafal" pada dek ini akan dikembalikan menjadi belum hafal.
+      </p>
+      <div class="grid grid-cols-2 gap-2.5 mt-5">
+        <button id="btn-cancel-reset" type="button"
+          class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold transition cursor-pointer">
+          Batal
+        </button>
+        <button id="btn-confirm-reset" type="button"
+          class="py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer">
+          Ya, Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       5. JAVASCRIPT: DATABASE KANA 46 HURUF, MESIN TRACING & FLASHCARD
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ======================================================================
+         A. DATABASE LENGKAP 46 HURUF HIRAGANA & KATAKANA (BARIS A–N)
+            Setiap goresan mematuhi 100% aturan urutan garis Jepang (Kakijun).
+            Koordinat dalam ruang kanvas standar [0..100, 0..100].
+         ====================================================================== */
+      const ROW_DEFS = [
+        { id: 'all', label: 'Semua (A–N)', short: 'Semua' },
+        { id: 'a',   label: 'Baris A (あ/ア)', short: 'Baris A' },
+        { id: 'ka',  label: 'Baris Ka (か/カ)', short: 'Ka' },
+        { id: 'sa',  label: 'Baris Sa (さ/サ)', short: 'Sa' },
+        { id: 'ta',  label: 'Baris Ta (た/タ)', short: 'Ta' },
+        { id: 'na',  label: 'Baris Na (な/ナ)', short: 'Na' },
+        { id: 'ha',  label: 'Baris Ha (は/ハ)', short: 'Ha' },
+        { id: 'ma',  label: 'Baris Ma (ま/マ)', short: 'Ma' },
+        { id: 'ya',  label: 'Baris Ya (や/ヤ)', short: 'Ya' },
+        { id: 'ra',  label: 'Baris Ra (ら/ラ)', short: 'Ra' },
+        { id: 'wa',  label: 'Baris Wa–N (わ/ワ)', short: 'Wa–N' },
+      ];
+
+      const KANA_DATABASE = [
+        // ---------------- A. BARIS A (あ行 / ア行) ----------------
+        {
+          id: 'a', row: 'a', rowName: 'Baris A', vowelCol: 0, romaji: 'a',
+          hiragana: {
+            char: 'あ', word: 'あさ', wordRomaji: 'asa', meaning: 'pagi',
+            strokes: [
+              [[26, 28], [72, 26]],
+              [[48, 15], [46, 52], [48, 84]],
+              [[64, 42], [52, 62], [32, 76], [24, 68], [34, 50], [58, 46], [76, 56], [74, 74], [58, 84]]
+            ]
+          },
+          katakana: {
+            char: 'ア', word: 'アイス', wordRomaji: 'aisu', meaning: 'es krim',
+            strokes: [
+              [[22, 26], [78, 26], [56, 48]],
+              [[50, 40], [46, 64], [30, 82]]
+            ]
+          }
+        },
+        {
+          id: 'i', row: 'a', rowName: 'Baris A', vowelCol: 1, romaji: 'i',
+          hiragana: {
+            char: 'い', word: 'いす', wordRomaji: 'isu', meaning: 'kursi',
+            strokes: [
+              [[26, 26], [25, 54], [32, 74], [42, 64]],
+              [[64, 30], [73, 48], [76, 68]]
+            ]
+          },
+          katakana: {
+            char: 'イ', word: 'インドネシア', wordRomaji: 'Indoneshia', meaning: 'Indonesia',
+            strokes: [
+              [[68, 20], [46, 44], [22, 60]],
+              [[52, 40], [52, 84]]
+            ]
+          }
+        },
+        {
+          id: 'u', row: 'a', rowName: 'Baris A', vowelCol: 2, romaji: 'u',
+          hiragana: {
+            char: 'う', word: 'うみ', wordRomaji: 'umi', meaning: 'laut',
+            strokes: [
+              [[42, 18], [56, 25]],
+              [[30, 42], [52, 35], [68, 44], [64, 66], [42, 84]]
+            ]
+          },
+          katakana: {
+            char: 'ウ', word: 'ウイルス', wordRomaji: 'uirusu', meaning: 'virus',
+            strokes: [
+              [[50, 16], [50, 30]],
+              [[26, 30], [26, 50]],
+              [[26, 32], [74, 32], [66, 62], [42, 82]]
+            ]
+          }
+        },
+        {
+          id: 'e', row: 'a', rowName: 'Baris A', vowelCol: 3, romaji: 'e',
+          hiragana: {
+            char: 'え', word: 'えき', wordRomaji: 'eki', meaning: 'stasiun',
+            strokes: [
+              [[40, 18], [56, 24]],
+              [[26, 40], [64, 36], [32, 74], [48, 58], [60, 76], [76, 76]]
+            ]
+          },
+          katakana: {
+            char: 'エ', word: 'エアコン', wordRomaji: 'eakon', meaning: 'AC',
+            strokes: [
+              [[28, 28], [72, 28]],
+              [[50, 28], [50, 74]],
+              [[20, 74], [80, 74]]
+            ]
+          }
+        },
+        {
+          id: 'o', row: 'a', rowName: 'Baris A', vowelCol: 4, romaji: 'o',
+          hiragana: {
+            char: 'お', word: 'おちゃ', wordRomaji: 'ocha', meaning: 'teh',
+            strokes: [
+              [[24, 32], [54, 30]],
+              [[40, 16], [40, 78], [30, 82], [24, 72], [38, 56], [62, 52], [76, 64], [70, 80], [56, 82]],
+              [[66, 24], [76, 34]]
+            ]
+          },
+          katakana: {
+            char: 'オ', word: 'オレンジ', wordRomaji: 'orenji', meaning: 'jeruk',
+            strokes: [
+              [[22, 34], [78, 34]],
+              [[56, 18], [56, 82], [44, 72]],
+              [[54, 36], [38, 56], [20, 72]]
+            ]
+          }
+        },
+
+        // ---------------- B. BARIS KA (か行 / カ行) ----------------
+        {
+          id: 'ka', row: 'ka', rowName: 'Baris Ka', vowelCol: 0, romaji: 'ka',
+          hiragana: {
+            char: 'か', word: 'かばん', wordRomaji: 'kaban', meaning: 'tas',
+            strokes: [
+              [[22, 38], [52, 34], [54, 68], [44, 78], [38, 70]],
+              [[39, 20], [33, 54], [24, 78]],
+              [[66, 30], [78, 52]]
+            ]
+          },
+          katakana: {
+            char: 'カ', word: 'カメラ', wordRomaji: 'kamera', meaning: 'kamera',
+            strokes: [
+              [[24, 36], [72, 36], [66, 74], [54, 82], [46, 72]],
+              [[48, 18], [42, 54], [24, 80]]
+            ]
+          }
+        },
+        {
+          id: 'ki', row: 'ka', rowName: 'Baris Ka', vowelCol: 1, romaji: 'ki',
+          hiragana: {
+            char: 'き', word: 'きって', wordRomaji: 'kitte', meaning: 'prangko',
+            strokes: [
+              [[26, 30], [70, 26]],
+              [[24, 48], [72, 44]],
+              [[44, 16], [56, 56], [48, 62]],
+              [[30, 66], [34, 78], [54, 82], [68, 78]]
+            ]
+          },
+          katakana: {
+            char: 'キ', word: 'キロ', wordRomaji: 'kiro', meaning: 'kilo',
+            strokes: [
+              [[26, 34], [72, 28]],
+              [[20, 54], [78, 48]],
+              [[44, 18], [56, 82]]
+            ]
+          }
+        },
+        {
+          id: 'ku', row: 'ka', rowName: 'Baris Ka', vowelCol: 2, romaji: 'ku',
+          hiragana: {
+            char: 'く', word: 'くつ', wordRomaji: 'kutsu', meaning: 'sepatu',
+            strokes: [
+              [[60, 18], [34, 48], [62, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ク', word: 'クラス', wordRomaji: 'kurasu', meaning: 'kelas',
+            strokes: [
+              [[44, 18], [34, 38], [22, 52]],
+              [[42, 30], [72, 30], [60, 60], [32, 82]]
+            ]
+          }
+        },
+        {
+          id: 'ke', row: 'ka', rowName: 'Baris Ka', vowelCol: 3, romaji: 'ke',
+          hiragana: {
+            char: 'け', word: 'けいたい', wordRomaji: 'keitai', meaning: 'ponsel',
+            strokes: [
+              [[28, 22], [25, 54], [30, 78], [36, 68]],
+              [[44, 38], [76, 35]],
+              [[62, 18], [62, 54], [48, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ケ', word: 'ケーキ', wordRomaji: 'keeki', meaning: 'kue',
+            strokes: [
+              [[40, 18], [30, 42], [20, 56]],
+              [[34, 38], [78, 38]],
+              [[56, 38], [50, 64], [34, 82]]
+            ]
+          }
+        },
+        {
+          id: 'ko', row: 'ka', rowName: 'Baris Ka', vowelCol: 4, romaji: 'ko',
+          hiragana: {
+            char: 'こ', word: 'こども', wordRomaji: 'kodomo', meaning: 'anak',
+            strokes: [
+              [[30, 28], [66, 28], [60, 38]],
+              [[28, 64], [36, 76], [72, 76]]
+            ]
+          },
+          katakana: {
+            char: 'コ', word: 'コーヒー', wordRomaji: 'koohii', meaning: 'kopi',
+            strokes: [
+              [[26, 28], [72, 28], [72, 72]],
+              [[24, 72], [74, 72]]
+            ]
+          }
+        },
+
+        // ---------------- C. BARIS SA (さ行 / サ行) ----------------
+        {
+          id: 'sa', row: 'sa', rowName: 'Baris Sa', vowelCol: 0, romaji: 'sa',
+          hiragana: {
+            char: 'さ', word: 'さくら', wordRomaji: 'sakura', meaning: 'bunga sakura',
+            strokes: [
+              [[26, 34], [72, 30]],
+              [[44, 18], [58, 56], [48, 62]],
+              [[30, 66], [34, 78], [56, 82], [68, 78]]
+            ]
+          },
+          katakana: {
+            char: 'サ', word: 'サッカー', wordRomaji: 'sakkaa', meaning: 'sepak bola',
+            strokes: [
+              [[20, 38], [80, 38]],
+              [[36, 20], [36, 56]],
+              [[64, 18], [64, 54], [44, 80]]
+            ]
+          }
+        },
+        {
+          id: 'shi', row: 'sa', rowName: 'Baris Sa', vowelCol: 1, romaji: 'shi',
+          hiragana: {
+            char: 'し', word: 'しんぶん', wordRomaji: 'shinbun', meaning: 'koran',
+            strokes: [
+              [[36, 20], [35, 62], [44, 78], [64, 76], [76, 62]]
+            ]
+          },
+          katakana: {
+            char: 'シ', word: 'シャツ', wordRomaji: 'shatsu', meaning: 'kemeja',
+            // 2 titik dari atas ke bawah, lalu garis ke-3 menarik dari bawah ke atas
+            strokes: [
+              [[30, 24], [44, 34]],
+              [[24, 44], [38, 54]],
+              [[32, 78], [58, 62], [78, 36]]
+            ]
+          }
+        },
+        {
+          id: 'su', row: 'sa', rowName: 'Baris Sa', vowelCol: 2, romaji: 'su',
+          hiragana: {
+            char: 'す', word: 'すし', wordRomaji: 'sushi', meaning: 'sushi',
+            strokes: [
+              [[22, 30], [76, 28]],
+              [[52, 16], [52, 56], [42, 62], [36, 52], [44, 42], [54, 48], [52, 70], [38, 84]]
+            ]
+          },
+          katakana: {
+            char: 'ス', word: 'スポーツ', wordRomaji: 'supootsu', meaning: 'olahraga',
+            strokes: [
+              [[26, 26], [70, 26], [50, 58], [22, 80]],
+              [[54, 54], [78, 78]]
+            ]
+          }
+        },
+        {
+          id: 'se', row: 'sa', rowName: 'Baris Sa', vowelCol: 3, romaji: 'se',
+          hiragana: {
+            char: 'せ', word: 'せんせい', wordRomaji: 'sensei', meaning: 'guru',
+            strokes: [
+              [[20, 42], [80, 38]],
+              [[64, 20], [64, 52], [54, 58]],
+              [[36, 24], [36, 68], [46, 78], [72, 76]]
+            ]
+          },
+          katakana: {
+            char: 'セ', word: 'セーター', wordRomaji: 'seetaa', meaning: 'sweter',
+            strokes: [
+              [[20, 44], [78, 36], [60, 56]],
+              [[38, 20], [38, 68], [48, 76], [76, 76]]
+            ]
+          }
+        },
+        {
+          id: 'so', row: 'sa', rowName: 'Baris Sa', vowelCol: 4, romaji: 'so',
+          hiragana: {
+            char: 'そ', word: 'そら', wordRomaji: 'sora', meaning: 'langit',
+            strokes: [
+              [[32, 22], [62, 20], [30, 46], [74, 42], [46, 56], [42, 72], [54, 82], [70, 80]]
+            ]
+          },
+          katakana: {
+            char: 'ソ', word: 'ソフト', wordRomaji: 'sofuto', meaning: 'perangkat lunak',
+            // Titik kiri atas lalu garis ke-2 miring turun dari kanan atas ke kiri bawah
+            strokes: [
+              [[30, 24], [42, 44]],
+              [[72, 24], [56, 58], [32, 80]]
+            ]
+          }
+        },
+
+        // ---------------- D. BARIS TA (た行 / タ行) ----------------
+        {
+          id: 'ta', row: 'ta', rowName: 'Baris Ta', vowelCol: 0, romaji: 'ta',
+          hiragana: {
+            char: 'た', word: 'たべる', wordRomaji: 'taberu', meaning: 'makan',
+            strokes: [
+              [[22, 32], [52, 30]],
+              [[38, 16], [30, 54], [22, 82]],
+              [[52, 46], [74, 44]],
+              [[50, 68], [60, 78], [76, 78]]
+            ]
+          },
+          katakana: {
+            char: 'タ', word: 'タクシー', wordRomaji: 'takushii', meaning: 'taksi',
+            strokes: [
+              [[44, 18], [32, 38], [20, 52]],
+              [[42, 30], [72, 30], [58, 60], [28, 82]],
+              [[38, 44], [56, 56]]
+            ]
+          }
+        },
+        {
+          id: 'chi', row: 'ta', rowName: 'Baris Ta', vowelCol: 1, romaji: 'chi',
+          hiragana: {
+            char: 'ち', word: 'ちず', wordRomaji: 'chizu', meaning: 'peta',
+            strokes: [
+              [[24, 32], [70, 28]],
+              [[44, 16], [36, 54], [56, 48], [72, 58], [66, 76], [42, 84]]
+            ]
+          },
+          katakana: {
+            char: 'チ', word: 'チーズ', wordRomaji: 'chiizu', meaning: 'keju',
+            strokes: [
+              [[64, 20], [44, 28], [26, 32]],
+              [[20, 50], [80, 50]],
+              [[50, 28], [48, 60], [32, 82]]
+            ]
+          }
+        },
+        {
+          id: 'tsu', row: 'ta', rowName: 'Baris Ta', vowelCol: 2, romaji: 'tsu',
+          hiragana: {
+            char: 'つ', word: 'つくえ', wordRomaji: 'tsukue', meaning: 'meja',
+            strokes: [
+              [[22, 42], [52, 30], [76, 44], [70, 66], [44, 80]]
+            ]
+          },
+          katakana: {
+            char: 'ツ', word: 'ツアー', wordRomaji: 'tsuaa', meaning: 'tur',
+            // 2 titik atas digores kiri ke kanan, lalu garis ke-3 turun dari kanan atas
+            strokes: [
+              [[24, 24], [34, 42]],
+              [[46, 20], [54, 38]],
+              [[74, 24], [60, 58], [34, 80]]
+            ]
+          }
+        },
+        {
+          id: 'te', row: 'ta', rowName: 'Baris Ta', vowelCol: 3, romaji: 'te',
+          hiragana: {
+            char: 'て', word: 'てがみ', wordRomaji: 'tegami', meaning: 'surat',
+            strokes: [
+              [[22, 28], [74, 24], [48, 44], [42, 64], [52, 78], [70, 80]]
+            ]
+          },
+          katakana: {
+            char: 'テ', word: 'テレビ', wordRomaji: 'terebi', meaning: 'televisi',
+            strokes: [
+              [[28, 24], [72, 24]],
+              [[20, 46], [80, 46]],
+              [[50, 46], [46, 66], [32, 82]]
+            ]
+          }
+        },
+        {
+          id: 'to', row: 'ta', rowName: 'Baris Ta', vowelCol: 4, romaji: 'to',
+          hiragana: {
+            char: 'と', word: 'とけい', wordRomaji: 'tokei', meaning: 'jam',
+            strokes: [
+              [[36, 20], [44, 46]],
+              [[72, 34], [42, 50], [32, 66], [44, 78], [74, 76]]
+            ]
+          },
+          katakana: {
+            char: 'ト', word: 'トイレ', wordRomaji: 'toire', meaning: 'toilet',
+            strokes: [
+              [[42, 18], [42, 82]],
+              [[42, 44], [72, 58]]
+            ]
+          }
+        },
+
+        // ---------------- E. BARIS NA (な行 / ナ行) ----------------
+        {
+          id: 'na', row: 'na', rowName: 'Baris Na', vowelCol: 0, romaji: 'na',
+          hiragana: {
+            char: 'な', word: 'なまえ', wordRomaji: 'namae', meaning: 'nama',
+            strokes: [
+              [[20, 32], [48, 30]],
+              [[34, 16], [26, 54], [20, 76]],
+              [[60, 26], [74, 34]],
+              [[58, 46], [58, 74], [48, 82], [40, 74], [48, 66], [64, 70], [76, 78]]
+            ]
+          },
+          katakana: {
+            char: 'ナ', word: 'ナイフ', wordRomaji: 'naifu', meaning: 'pisau',
+            strokes: [
+              [[20, 38], [80, 38]],
+              [[52, 18], [50, 56], [32, 80]]
+            ]
+          }
+        },
+        {
+          id: 'ni', row: 'na', rowName: 'Baris Na', vowelCol: 1, romaji: 'ni',
+          hiragana: {
+            char: 'に', word: 'にほん', wordRomaji: 'Nihon', meaning: 'Jepang',
+            strokes: [
+              [[28, 22], [25, 54], [30, 78], [36, 68]],
+              [[46, 32], [74, 30]],
+              [[44, 66], [54, 76], [76, 76]]
+            ]
+          },
+          katakana: {
+            char: 'ニ', word: 'ニュース', wordRomaji: 'nyuusu', meaning: 'berita',
+            strokes: [
+              [[28, 32], [72, 32]],
+              [[20, 70], [80, 70]]
+            ]
+          }
+        },
+        {
+          id: 'nu', row: 'na', rowName: 'Baris Na', vowelCol: 2, romaji: 'nu',
+          hiragana: {
+            char: 'ぬ', word: 'いぬ', wordRomaji: 'inu', meaning: 'anjing',
+            strokes: [
+              [[28, 26], [34, 54], [44, 74]],
+              [[54, 22], [42, 54], [24, 74], [22, 62], [38, 44], [64, 42], [78, 56], [72, 76], [60, 76], [60, 64], [72, 66], [82, 78]]
+            ]
+          },
+          katakana: {
+            char: 'ヌ', word: 'ヌードル', wordRomaji: 'nuudoru', meaning: 'mi',
+            strokes: [
+              [[26, 26], [70, 26], [50, 58], [22, 80]],
+              [[38, 42], [74, 74]]
+            ]
+          }
+        },
+        {
+          id: 'ne', row: 'na', rowName: 'Baris Na', vowelCol: 3, romaji: 'ne',
+          hiragana: {
+            char: 'ね', word: 'ねこ', wordRomaji: 'neko', meaning: 'kucing',
+            strokes: [
+              [[32, 18], [32, 82]],
+              [[20, 36], [42, 32], [22, 64], [48, 40], [68, 38], [74, 58], [66, 78], [54, 76], [56, 64], [68, 68], [80, 78]]
+            ]
+          },
+          katakana: {
+            char: 'ネ', word: 'ネクタイ', wordRomaji: 'nekutai', meaning: 'dasi',
+            strokes: [
+              [[46, 16], [54, 26]],
+              [[24, 34], [72, 34], [48, 56], [20, 74]],
+              [[50, 54], [50, 84]],
+              [[54, 56], [78, 72]]
+            ]
+          }
+        },
+        {
+          id: 'no', row: 'na', rowName: 'Baris Na', vowelCol: 4, romaji: 'no',
+          hiragana: {
+            char: 'の', word: 'のむ', wordRomaji: 'nomu', meaning: 'minum',
+            strokes: [
+              [[52, 28], [46, 56], [32, 74], [22, 64], [28, 38], [52, 26], [74, 38], [76, 62], [58, 80]]
+            ]
+          },
+          katakana: {
+            char: 'ノ', word: 'ノート', wordRomaji: 'nooto', meaning: 'buku catatan',
+            strokes: [
+              [[66, 22], [50, 56], [28, 80]]
+            ]
+          }
+        },
+
+        // ---------------- F. BARIS HA (は行 / ハ行) ----------------
+        {
+          id: 'ha', row: 'ha', rowName: 'Baris Ha', vowelCol: 0, romaji: 'ha',
+          hiragana: {
+            char: 'は', word: 'はな', wordRomaji: 'hana', meaning: 'bunga',
+            strokes: [
+              [[26, 22], [24, 54], [28, 78], [34, 68]],
+              [[44, 34], [74, 32]],
+              [[62, 18], [62, 72], [52, 80], [42, 72], [50, 62], [66, 66], [78, 76]]
+            ]
+          },
+          katakana: {
+            char: 'ハ', word: 'ハンカチ', wordRomaji: 'hankachi', meaning: 'sapu tangan',
+            strokes: [
+              [[38, 28], [30, 56], [18, 76]],
+              [[60, 28], [68, 56], [82, 76]]
+            ]
+          }
+        },
+        {
+          id: 'hi', row: 'ha', rowName: 'Baris Ha', vowelCol: 1, romaji: 'hi',
+          hiragana: {
+            char: 'ひ', word: 'ひこうき', wordRomaji: 'hikouki', meaning: 'pesawat',
+            strokes: [
+              [[22, 32], [42, 28], [32, 54], [36, 74], [52, 78], [66, 62], [66, 34], [78, 66]]
+            ]
+          },
+          katakana: {
+            char: 'ヒ', word: 'ヒント', wordRomaji: 'hinto', meaning: 'petunjuk',
+            strokes: [
+              [[34, 44], [56, 38], [74, 32]],
+              [[34, 20], [34, 68], [44, 76], [76, 76]]
+            ]
+          }
+        },
+        {
+          id: 'fu', row: 'ha', rowName: 'Baris Ha', vowelCol: 2, romaji: 'fu',
+          hiragana: {
+            char: 'ふ', word: 'ふじさん', wordRomaji: 'Fujisan', meaning: 'Gunung Fuji',
+            strokes: [
+              [[44, 18], [56, 26]],
+              [[46, 38], [54, 56], [50, 74], [40, 70]],
+              [[26, 56], [20, 72]],
+              [[70, 54], [80, 70]]
+            ]
+          },
+          katakana: {
+            char: 'フ', word: 'フルーツ', wordRomaji: 'furuutsu', meaning: 'buah',
+            strokes: [
+              [[24, 28], [74, 28], [58, 60], [30, 80]]
+            ]
+          }
+        },
+        {
+          id: 'he', row: 'ha', rowName: 'Baris Ha', vowelCol: 3, romaji: 'he',
+          hiragana: {
+            char: 'へ', word: 'へや', wordRomaji: 'heya', meaning: 'kamar',
+            strokes: [
+              [[18, 56], [36, 36], [62, 56], [82, 70]]
+            ]
+          },
+          katakana: {
+            char: 'ヘ', word: 'ヘルメット', wordRomaji: 'herumetto', meaning: 'helm',
+            strokes: [
+              [[18, 56], [36, 36], [62, 56], [82, 70]]
+            ]
+          }
+        },
+        {
+          id: 'ho', row: 'ha', rowName: 'Baris Ha', vowelCol: 4, romaji: 'ho',
+          hiragana: {
+            char: 'ほ', word: 'ほん', wordRomaji: 'hon', meaning: 'buku',
+            strokes: [
+              [[26, 22], [24, 54], [28, 78], [34, 68]],
+              [[44, 28], [74, 26]],
+              [[44, 46], [74, 44]],
+              [[60, 28], [60, 72], [50, 80], [42, 72], [50, 62], [66, 66], [78, 76]]
+            ]
+          },
+          katakana: {
+            char: 'ホ', word: 'ホテル', wordRomaji: 'hoteru', meaning: 'hotel',
+            strokes: [
+              [[22, 34], [78, 34]],
+              [[50, 18], [50, 82], [40, 72]],
+              [[32, 48], [20, 70]],
+              [[68, 48], [80, 70]]
+            ]
+          }
+        },
+
+        // ---------------- G. BARIS MA (ま行 / マ行) ----------------
+        {
+          id: 'ma', row: 'ma', rowName: 'Baris Ma', vowelCol: 0, romaji: 'ma',
+          hiragana: {
+            char: 'ま', word: 'まど', wordRomaji: 'mado', meaning: 'jendela',
+            strokes: [
+              [[24, 30], [74, 28]],
+              [[26, 48], [72, 46]],
+              [[50, 16], [50, 72], [40, 80], [32, 72], [40, 62], [58, 66], [74, 76]]
+            ]
+          },
+          katakana: {
+            char: 'マ', word: 'マイク', wordRomaji: 'maiku', meaning: 'mikrofon',
+            strokes: [
+              [[22, 30], [76, 30], [54, 58]],
+              [[40, 48], [64, 74]]
+            ]
+          }
+        },
+        {
+          id: 'mi', row: 'ma', rowName: 'Baris Ma', vowelCol: 1, romaji: 'mi',
+          hiragana: {
+            char: 'み', word: 'みず', wordRomaji: 'mizu', meaning: 'air',
+            strokes: [
+              [[28, 26], [54, 24], [42, 58], [30, 72], [22, 64], [32, 54], [56, 56], [78, 68]],
+              [[68, 42], [64, 66], [52, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ミ', word: 'ミルク', wordRomaji: 'miruku', meaning: 'susu',
+            strokes: [
+              [[30, 24], [68, 34]],
+              [[28, 46], [66, 56]],
+              [[24, 68], [72, 80]]
+            ]
+          }
+        },
+        {
+          id: 'mu', row: 'ma', rowName: 'Baris Ma', vowelCol: 2, romaji: 'mu',
+          hiragana: {
+            char: 'む', word: 'むし', wordRomaji: 'mushi', meaning: 'serangga',
+            strokes: [
+              [[22, 32], [54, 30]],
+              [[40, 16], [40, 56], [32, 64], [26, 54], [34, 46], [42, 52], [40, 74], [52, 80], [74, 78], [76, 62]],
+              [[66, 28], [76, 38]]
+            ]
+          },
+          katakana: {
+            char: 'ム', word: 'チーム', wordRomaji: 'chiimu', meaning: 'tim',
+            strokes: [
+              [[52, 22], [26, 72], [72, 68]],
+              [[62, 52], [80, 78]]
+            ]
+          }
+        },
+        {
+          id: 'me', row: 'ma', rowName: 'Baris Ma', vowelCol: 3, romaji: 'me',
+          hiragana: {
+            char: 'め', word: 'めがね', wordRomaji: 'megane', meaning: 'kacamata',
+            strokes: [
+              [[28, 26], [34, 54], [44, 74]],
+              [[54, 22], [42, 54], [24, 74], [22, 62], [38, 44], [64, 42], [78, 58], [72, 76], [56, 82]]
+            ]
+          },
+          katakana: {
+            char: 'メ', word: 'メニュー', wordRomaji: 'menyu', meaning: 'menu',
+            strokes: [
+              [[66, 20], [48, 56], [24, 80]],
+              [[32, 36], [72, 68]]
+            ]
+          }
+        },
+        {
+          id: 'mo', row: 'ma', rowName: 'Baris Ma', vowelCol: 4, romaji: 'mo',
+          hiragana: {
+            char: 'も', word: 'もも', wordRomaji: 'momo', meaning: 'persik',
+            strokes: [
+              [[48, 16], [42, 56], [46, 76], [62, 80], [72, 68]],
+              [[28, 34], [66, 32]],
+              [[26, 52], [66, 50]]
+            ]
+          },
+          katakana: {
+            char: 'モ', word: 'モニター', wordRomaji: 'monitaa', meaning: 'monitor',
+            strokes: [
+              [[28, 28], [72, 28]],
+              [[22, 50], [78, 50]],
+              [[48, 28], [48, 68], [58, 76], [76, 76]]
+            ]
+          }
+        },
+
+        // ---------------- H. BARIS YA (や行 / ヤ行) ----------------
+        {
+          id: 'ya', row: 'ya', rowName: 'Baris Ya', vowelCol: 0, romaji: 'ya',
+          hiragana: {
+            char: 'や', word: 'やま', wordRomaji: 'yama', meaning: 'gunung',
+            strokes: [
+              [[20, 46], [52, 32], [76, 40], [74, 58], [60, 64]],
+              [[54, 18], [62, 28]],
+              [[34, 24], [46, 56], [56, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ヤ', word: 'ヤシ', wordRomaji: 'yashi', meaning: 'kelapa',
+            strokes: [
+              [[20, 42], [78, 32], [62, 54]],
+              [[42, 18], [56, 82]]
+            ]
+          }
+        },
+        {
+          id: 'yu', row: 'ya', rowName: 'Baris Ya', vowelCol: 2, romaji: 'yu',
+          hiragana: {
+            char: 'ゆ', word: 'ゆき', wordRomaji: 'yuki', meaning: 'salju',
+            strokes: [
+              [[28, 24], [26, 56], [30, 72], [38, 50], [58, 34], [76, 46], [74, 66], [54, 74]],
+              [[54, 20], [54, 58], [44, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ユ', word: 'ユニフォーム', wordRomaji: 'yunifoomu', meaning: 'seragam',
+            strokes: [
+              [[28, 32], [68, 32], [64, 72]],
+              [[20, 72], [80, 72]]
+            ]
+          }
+        },
+        {
+          id: 'yo', row: 'ya', rowName: 'Baris Ya', vowelCol: 4, romaji: 'yo',
+          hiragana: {
+            char: 'よ', word: 'よる', wordRomaji: 'yoru', meaning: 'malam',
+            strokes: [
+              [[52, 34], [74, 32]],
+              [[50, 18], [50, 72], [40, 80], [32, 72], [40, 62], [58, 66], [74, 76]]
+            ]
+          },
+          katakana: {
+            char: 'ヨ', word: 'ヨーロッパ', wordRomaji: 'Yooroppa', meaning: 'Eropa',
+            strokes: [
+              [[26, 26], [72, 26], [72, 74]],
+              [[26, 50], [72, 50]],
+              [[24, 74], [72, 74]]
+            ]
+          }
+        },
+
+        // ---------------- I. BARIS RA (ら行 / ラ行) ----------------
+        {
+          id: 'ra', row: 'ra', rowName: 'Baris Ra', vowelCol: 0, romaji: 'ra',
+          hiragana: {
+            char: 'ら', word: 'らいねん', wordRomaji: 'rainen', meaning: 'tahun depan',
+            strokes: [
+              [[40, 18], [56, 26]],
+              [[34, 34], [30, 58], [50, 48], [68, 56], [64, 74], [40, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ラ', word: 'ラジオ', wordRomaji: 'rajio', meaning: 'radio',
+            strokes: [
+              [[30, 24], [70, 24]],
+              [[22, 44], [76, 44], [62, 68], [34, 82]]
+            ]
+          }
+        },
+        {
+          id: 'ri', row: 'ra', rowName: 'Baris Ra', vowelCol: 1, romaji: 'ri',
+          hiragana: {
+            char: 'り', word: 'りんご', wordRomaji: 'ringo', meaning: 'apel',
+            strokes: [
+              [[32, 22], [30, 52], [36, 62]],
+              [[64, 20], [68, 52], [58, 74], [44, 84]]
+            ]
+          },
+          katakana: {
+            char: 'リ', word: 'リボン', wordRomaji: 'ribon', meaning: 'pita',
+            strokes: [
+              [[34, 22], [34, 56]],
+              [[66, 20], [66, 54], [46, 82]]
+            ]
+          }
+        },
+        {
+          id: 'ru', row: 'ra', rowName: 'Baris Ra', vowelCol: 2, romaji: 'ru',
+          hiragana: {
+            char: 'る', word: 'くるま', wordRomaji: 'kuruma', meaning: 'mobil',
+            strokes: [
+              [[30, 22], [62, 20], [30, 52], [56, 46], [74, 58], [68, 78], [48, 82], [42, 74], [50, 68], [62, 74]]
+            ]
+          },
+          katakana: {
+            char: 'ル', word: 'ルール', wordRomaji: 'ruuru', meaning: 'aturan',
+            strokes: [
+              [[36, 24], [34, 58], [20, 78]],
+              [[58, 20], [58, 74], [70, 64], [82, 52]]
+            ]
+          }
+        },
+        {
+          id: 're', row: 'ra', rowName: 'Baris Ra', vowelCol: 3, romaji: 're',
+          hiragana: {
+            char: 'れ', word: 'れきし', wordRomaji: 'rekishi', meaning: 'sejarah',
+            strokes: [
+              [[32, 18], [32, 82]],
+              [[20, 36], [42, 32], [22, 64], [50, 38], [68, 36], [66, 68], [74, 78], [82, 72]]
+            ]
+          },
+          katakana: {
+            char: 'レ', word: 'レモン', wordRomaji: 'remon', meaning: 'lemon',
+            strokes: [
+              [[34, 22], [34, 76], [58, 64], [80, 46]]
+            ]
+          }
+        },
+        {
+          id: 'ro', row: 'ra', rowName: 'Baris Ra', vowelCol: 4, romaji: 'ro',
+          hiragana: {
+            char: 'ろ', word: 'ろく', wordRomaji: 'roku', meaning: 'enam',
+            strokes: [
+              [[30, 22], [62, 20], [30, 52], [56, 46], [74, 58], [66, 76], [42, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ロ', word: 'ロボット', wordRomaji: 'robotto', meaning: 'robot',
+            strokes: [
+              [[26, 28], [26, 74]],
+              [[26, 28], [74, 28], [74, 74]],
+              [[26, 74], [74, 74]]
+            ]
+          }
+        },
+
+        // ---------------- J. BARIS WA–WO–N (わ行・ん / ワ行・ン) ----------------
+        {
+          id: 'wa', row: 'wa', rowName: 'Baris Wa–N', vowelCol: 0, romaji: 'wa',
+          hiragana: {
+            char: 'わ', word: 'わたし', wordRomaji: 'watashi', meaning: 'saya',
+            strokes: [
+              [[32, 18], [32, 82]],
+              [[20, 36], [42, 32], [22, 64], [50, 38], [72, 40], [76, 62], [56, 82]]
+            ]
+          },
+          katakana: {
+            char: 'ワ', word: 'ワイン', wordRomaji: 'wain', meaning: 'anggur',
+            strokes: [
+              [[26, 26], [26, 50]],
+              [[26, 28], [74, 28], [64, 62], [38, 82]]
+            ]
+          }
+        },
+        {
+          id: 'wo', row: 'wa', rowName: 'Baris Wa–N', vowelCol: 2, romaji: 'wo (o)',
+          hiragana: {
+            char: 'を', word: 'ほんをよむ', wordRomaji: 'hon wo yomu', meaning: 'membaca buku',
+            strokes: [
+              [[26, 28], [66, 26]],
+              [[44, 16], [34, 46], [52, 44], [52, 62]],
+              [[72, 46], [44, 58], [34, 72], [46, 82], [74, 80]]
+            ]
+          },
+          katakana: {
+            char: 'ヲ', word: 'ヲ', wordRomaji: 'wo (o)', meaning: 'partikel objek',
+            strokes: [
+              [[26, 26], [72, 26], [68, 48]],
+              [[26, 48], [68, 48]],
+              [[68, 48], [52, 68], [30, 82]]
+            ]
+          }
+        },
+        {
+          id: 'n', row: 'wa', rowName: 'Baris Wa–N', vowelCol: 4, romaji: 'n',
+          hiragana: {
+            char: 'ん', word: 'にほん', wordRomaji: 'Nihon', meaning: 'Jepang',
+            strokes: [
+              [[48, 20], [34, 54], [24, 78], [42, 56], [54, 54], [58, 72], [68, 78], [80, 68]]
+            ]
+          },
+          katakana: {
+            char: 'ン', word: 'パン', wordRomaji: 'pan', meaning: 'roti',
+            // Titik atas digores dulu, lalu goresan ke-2 menarik dari kiri bawah ke kanan atas
+            strokes: [
+              [[28, 26], [44, 38]],
+              [[28, 76], [56, 60], [78, 34]]
+            ]
+          }
+        }
+      ];
+
+      /* ======================================================================
+         B. UTILITAS GEOMETRI HALUS (CATMULL-ROM SPLINE DENGAN SUDUT TAJAM)
+         ====================================================================== */
+      function distance2D(p1, p2) {
+        const dx = p2[0] - p1[0];
+        const dy = p2[1] - p1[1];
+        return Math.hypot(dx, dy);
+      }
+
+      // Menghitung sudut belokan pada titik tengah (derajat)
+      function cornerAngleDeg(p0, p1, p2) {
+        const v1x = p0[0] - p1[0];
+        const v1y = p0[1] - p1[1];
+        const v2x = p2[0] - p1[0];
+        const v2y = p2[1] - p1[1];
+        const mag1 = Math.hypot(v1x, v1y);
+        const mag2 = Math.hypot(v2x, v2y);
+        if (mag1 === 0 || mag2 === 0) return 180;
+        const cosA = Math.max(-1, Math.min(1, (v1x * v2x + v1y * v2y) / (mag1 * mag2)));
+        return (Math.acos(cosA) * 180) / Math.PI;
+      }
+
+      // Resample segmen lurus menjadi titik rapat berjarak seragam
+      function resampleLinear(points, step = 1.4) {
+        if (points.length < 2) return points.slice();
+        const out = [points[0]];
+        for (let i = 0; i < points.length - 1; i++) {
+          const a = points[i];
+          const b = points[i + 1];
+          const d = distance2D(a, b);
+          const count = Math.max(1, Math.ceil(d / step));
+          for (let s = 1; s <= count; s++) {
+            const t = s / count;
+            out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+          }
+        }
+        return out;
+      }
+
+      // Interpolasi Catmull-Rom yang menjaga sudut tajam pada Katakana/Hiragana bersudut
+      function buildSmoothStrokePoints(rawPts) {
+        if (!rawPts || rawPts.length === 0) return [];
+        if (rawPts.length === 1) return [rawPts[0], rawPts[0]];
+        if (rawPts.length === 2) return resampleLinear(rawPts, 1.3);
+
+        // Pecah polyline pada titik yang memiliki sudut tajam (< 118 derajat)
+        const subChains = [];
+        let currentChain = [rawPts[0]];
+        for (let i = 1; i < rawPts.length - 1; i++) {
+          currentChain.push(rawPts[i]);
+          const angle = cornerAngleDeg(rawPts[i - 1], rawPts[i], rawPts[i + 1]);
+          if (angle < 118) {
+            subChains.push(currentChain);
+            currentChain = [rawPts[i]];
+          }
+        }
+        currentChain.push(rawPts[rawPts.length - 1]);
+        subChains.push(currentChain);
+
+        const finalPoints = [];
+        subChains.forEach((chain, cIdx) => {
+          if (chain.length === 2) {
+            const seg = resampleLinear(chain, 1.3);
+            if (cIdx > 0) seg.shift();
+            finalPoints.push(...seg);
+            return;
+          }
+
+          // Catmull-Rom centripetal/uniform untuk kurva mulus
+          const dense = [];
+          for (let i = 0; i < chain.length - 1; i++) {
+            const p0 = chain[i === 0 ? i : i - 1];
+            const p1 = chain[i];
+            const p2 = chain[i + 1];
+            const p3 = chain[i + 2 < chain.length ? i + 2 : i + 1];
+
+            const segDist = distance2D(p1, p2);
+            const steps = Math.max(8, Math.ceil(segDist / 1.2));
+            for (let s = 0; s <= steps; s++) {
+              const t = s / steps;
+              const t2 = t * t;
+              const t3 = t2 * t;
+              const x = 0.5 * (
+                (2 * p1[0]) +
+                (-p0[0] + p2[0]) * t +
+                (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 +
+                (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3
+              );
+              const y = 0.5 * (
+                (2 * p1[1]) +
+                (-p0[1] + p2[1]) * t +
+                (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 +
+                (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3
+              );
+              dense.push([x, y]);
+            }
+          }
+          const uniform = resampleLinear(dense, 1.3);
+          if (cIdx > 0 && uniform.length > 0) uniform.shift();
+          finalPoints.push(...uniform);
+        });
+
+        return finalPoints;
+      }
+
+      // Pre-compute semua smoothStrokes untuk performa tinggi saat menggambar
+      KANA_DATABASE.forEach(item => {
+        item.hiragana.smoothStrokes = item.hiragana.strokes.map(buildSmoothStrokePoints);
+        item.katakana.smoothStrokes = item.katakana.strokes.map(buildSmoothStrokePoints);
+      });
+
+      /* ======================================================================
+         C. MESIN AUDIO WEB SPEECH API & WEB AUDIO API (TANPA FILE EKSTERNAL)
+         ====================================================================== */
+      const SoundEngine = {
+        muted: false,
+        ctx: null,
+
+        ensureContext() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        },
+
+        playTone(freq, type = 'sine', duration = 0.16, gainVal = 0.12, delay = 0) {
+          if (this.muted) return;
+          try {
+            this.ensureContext();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime + delay;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.exponentialRampToValueAtTime(gainVal, now + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + duration + 0.02);
+          } catch (e) {
+            // Abaikan error konteks audio jika diblokir browser
+          }
+        },
+
+        playStrokeSuccess(strokeIdx) {
+          // Tangga nada pentatonik Jepang (Yo scale: D5, E5, G5, A5, B5)
+          const notes = [587.33, 659.25, 783.99, 880.0, 987.77];
+          const freq = notes[strokeIdx % notes.length];
+          this.playTone(freq, 'triangle', 0.22, 0.14, 0);
+        },
+
+        playStrokeError() {
+          this.playTone(175, 'sine', 0.18, 0.14, 0);
+          this.playTone(145, 'sine', 0.22, 0.12, 0.07);
+        },
+
+        playCharacterComplete() {
+          // Akor harmonis Jepang
+          this.playTone(587.33, 'triangle', 0.35, 0.12, 0);
+          this.playTone(880.00, 'triangle', 0.40, 0.12, 0.09);
+          this.playTone(1174.66, 'sine', 0.55, 0.14, 0.18);
+        },
+
+        playCardFlip() {
+          this.playTone(420, 'sine', 0.08, 0.06, 0);
+          this.playTone(620, 'sine', 0.09, 0.05, 0.03);
+        },
+
+        speakJapanese(text) {
+          if (this.muted || !text) return;
+          try {
+            if ('speechSynthesis' in window) {
+              window.speechSynthesis.cancel();
+              const utter = new SpeechSynthesisUtterance(text);
+              utter.lang = 'ja-JP';
+              utter.rate = 0.88;
+              utter.pitch = 1.02;
+              const voices = window.speechSynthesis.getVoices();
+              const jpVoice = voices.find(v => v.lang && v.lang.toLowerCase().includes('ja'));
+              if (jpVoice) utter.voice = jpVoice;
+              window.speechSynthesis.speak(utter);
+            }
+          } catch (e) {
+            // Fallback diam jika speechSynthesis tidak didukung
+          }
+        }
+      };
+
+      // Preload daftar suara browser
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+      }
+
+      /* ======================================================================
+         D. STATE APLIKASI & PENYIMPANAN LOKAL (LOCALSTORAGE)
+         ====================================================================== */
+      const STORAGE_KEY = 'nihongo_kana_studio_v1';
+
+      function loadSavedProgress() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (e) {}
+        return {
+          tracedHiragana: [],
+          tracedKatakana: [],
+          masteredHiragana: [],
+          masteredKatakana: []
+        };
+      }
+
+      const saved = loadSavedProgress();
+
+      const AppState = {
+        mode: 'tracing',        // 'tracing' | 'flashcard'
+        script: 'hiragana',     // 'hiragana' | 'katakana'
+        subMode: 'practice',    // 'practice' | 'test'
+        currentIndex: 0,        // 0..45 indeks di KANA_DATABASE
+        modalScript: 'hiragana',
+
+        // State Tracing Kanvas
+        completedStrokes: 0,
+        isDrawing: false,
+        activeProgressIdx: 0,
+        userTrail: [],
+        isAnimatingDemo: false,
+        demoStrokeIdx: 0,
+        demoPointIdx: 0,
+        pulsePhase: 0,
+        errorFlashAlpha: 0,
+
+        // State Flashcard
+        fcRowFilter: 'all',
+        fcDeckIndices: KANA_DATABASE.map((_, idx) => idx),
+        fcDeckPos: 0,
+        fcFlipped: false,
+
+        // Progres Siswa
+        tracedHiragana: new Set(saved.tracedHiragana || []),
+        tracedKatakana: new Set(saved.tracedKatakana || []),
+        masteredHiragana: new Set(saved.masteredHiragana || []),
+        masteredKatakana: new Set(saved.masteredKatakana || [])
+      };
+
+      function persistProgress() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            tracedHiragana: Array.from(AppState.tracedHiragana),
+            tracedKatakana: Array.from(AppState.tracedKatakana),
+            masteredHiragana: Array.from(AppState.masteredHiragana),
+            masteredKatakana: Array.from(AppState.masteredKatakana)
+          }));
+        } catch (e) {}
+      }
+
+      function getActiveEntry() {
+        return KANA_DATABASE[AppState.currentIndex];
+      }
+
+      function getActiveScriptData(entry = getActiveEntry()) {
+        return AppState.script === 'hiragana' ? entry.hiragana : entry.katakana;
+      }
+
+      /* ======================================================================
+         E. REFERENSI ELEMEN DOM
+         ====================================================================== */
+      const DOM = {
+        body: document.body,
+        btnModeTracing: document.getElementById('btn-mode-tracing'),
+        btnModeFlashcard: document.getElementById('btn-mode-flashcard'),
+        btnScriptHiragana: document.getElementById('btn-script-hiragana'),
+        btnScriptKatakana: document.getElementById('btn-script-katakana'),
+        btnOpenGojuon: document.getElementById('btn-open-gojuon'),
+        btnToggleAudio: document.getElementById('btn-toggle-audio'),
+        iconAudioOn: document.getElementById('icon-audio-on'),
+        iconAudioOff: document.getElementById('icon-audio-off'),
+        btnToggleFullscreen: document.getElementById('btn-toggle-fullscreen'),
+
+        // Views
+        viewTracing: document.getElementById('view-tracing'),
+        viewFlashcard: document.getElementById('view-flashcard'),
+
+        // Tracing Elements
+        tracingScriptBadge: document.getElementById('tracing-script-badge'),
+        tracingScriptDesc: document.getElementById('tracing-script-desc'),
+        tracingCounterBadge: document.getElementById('tracing-counter-badge'),
+        canvasStageWrapper: document.getElementById('canvas-stage-wrapper'),
+        canvasBox: document.getElementById('canvas-box'),
+        canvas: document.getElementById('tracing-canvas'),
+        feedbackBanner: document.getElementById('tracing-feedback-banner'),
+        stampOverlay: document.getElementById('tracing-stamp-overlay'),
+        stampCard: document.getElementById('tracing-stamp-card'),
+        tracingCharPreview: document.getElementById('tracing-char-preview'),
+        tracingRomaji: document.getElementById('tracing-romaji'),
+        tracingStrokeInfo: document.getElementById('tracing-stroke-info'),
+        btnTracingSpeak: document.getElementById('btn-tracing-speak'),
+        btnSubmodePractice: document.getElementById('btn-submode-practice'),
+        btnSubmodeTest: document.getElementById('btn-submode-test'),
+        tracingMasteredPill: document.getElementById('tracing-mastered-pill'),
+        tracingVocabJp: document.getElementById('tracing-vocab-jp'),
+        tracingVocabMeaning: document.getElementById('tracing-vocab-meaning'),
+        btnTracingSpeakVocab: document.getElementById('btn-tracing-speak-vocab'),
+        tracingProgressLabel: document.getElementById('tracing-progress-label'),
+        tracingProgressCount: document.getElementById('tracing-progress-count'),
+        tracingProgressBar: document.getElementById('tracing-progress-bar'),
+        btnTracingDemo: document.getElementById('btn-tracing-demo'),
+        btnTracingClear: document.getElementById('btn-tracing-clear'),
+        btnTracingPrev: document.getElementById('btn-tracing-prev'),
+        btnTracingNext: document.getElementById('btn-tracing-next'),
+
+        // Flashcard Elements
+        fcRowFilters: document.getElementById('fc-row-filters'),
+        fcProgressText: document.getElementById('fc-progress-text'),
+        fcProgressBar: document.getElementById('fc-progress-bar'),
+        btnFcResetPrompt: document.getElementById('btn-fc-reset-prompt'),
+        flashcardScene: document.getElementById('flashcard-scene'),
+        flashcardInner: document.getElementById('flashcard-inner'),
+        fcFrontBadge: document.getElementById('fc-front-badge'),
+        fcMasteredBadge: document.getElementById('fc-mastered-badge'),
+        fcCardIndex: document.getElementById('fc-card-index'),
+        fcFrontChar: document.getElementById('fc-front-char'),
+        btnFcSpeakFront: document.getElementById('btn-fc-speak-front'),
+        fcBackRomaji: document.getElementById('fc-back-romaji'),
+        fcBackMeta: document.getElementById('fc-back-meta'),
+        fcMiniStrokeCanvas: document.getElementById('fc-mini-stroke-canvas'),
+        fcBackVocabJp: document.getElementById('fc-back-vocab-jp'),
+        fcBackVocabMeaning: document.getElementById('fc-back-vocab-meaning'),
+        btnFcSpeakVocab: document.getElementById('btn-fc-speak-vocab'),
+        btnFcGoTracing: document.getElementById('btn-fc-go-tracing'),
+        fcSideScriptLabel: document.getElementById('fc-side-script-label'),
+        fcSideScriptDesc: document.getElementById('fc-side-script-desc'),
+        btnFcUnmastered: document.getElementById('btn-fc-unmastered'),
+        btnFcMastered: document.getElementById('btn-fc-mastered'),
+        btnFcPrev: document.getElementById('btn-fc-prev'),
+        btnFcShuffle: document.getElementById('btn-fc-shuffle'),
+        btnFcNext: document.getElementById('btn-fc-next'),
+
+        // Modal Gojuon & Reset
+        modalGojuon: document.getElementById('modal-gojuon'),
+        btnModalTabHiragana: document.getElementById('btn-modal-tab-hiragana'),
+        btnModalTabKatakana: document.getElementById('btn-modal-tab-katakana'),
+        btnCloseGojuon: document.getElementById('btn-close-gojuon'),
+        gojuonGridContainer: document.getElementById('gojuon-grid-container'),
+
+        modalResetConfirm: document.getElementById('modal-reset-confirm'),
+        resetConfirmDesc: document.getElementById('reset-confirm-desc'),
+        btnCancelReset: document.getElementById('btn-cancel-reset'),
+        btnConfirmReset: document.getElementById('btn-confirm-reset')
+      };
+
+      /* ======================================================================
+         F. MESIN KANVAS TRACING (GENKOUYOUSHI, KAKIJUN & VALIDASI GORESAN)
+         ====================================================================== */
+      const ctx = DOM.canvas.getContext('2d');
+      let canvasLogicalSize = 360;
+      let feedbackTimer = null;
+
+      function resizeTracingCanvas() {
+        if (AppState.mode !== 'tracing') return;
+        const rect = DOM.canvasStageWrapper.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        // Ambil ukuran persegi terbesar yang pas di kontainer tanpa overflow
+        const size = Math.max(210, Math.floor(Math.min(rect.width - 8, rect.height - 8, 520)));
+        canvasLogicalSize = size;
+
+        DOM.canvasBox.style.width = `${size}px`;
+        DOM.canvasBox.style.height = `${size}px`;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 3);
+        DOM.canvas.width = Math.floor(size * dpr);
+        DOM.canvas.height = Math.floor(size * dpr);
+        DOM.canvas.style.width = `${size}px`;
+        DOM.canvas.style.height = `${size}px`;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        renderTracingCanvas();
+      }
+
+      // Konversi koordinat [0..100] ke piksel logis kanvas
+      function toCanvasPx(pt) {
+        return [(pt[0] / 100) * canvasLogicalSize, (pt[1] / 100) * canvasLogicalSize];
+      }
+
+      // Konversi piksel kanvas ke koordinat standar [0..100]
+      function toNormCoords(clientX, clientY) {
+        const rect = DOM.canvas.getBoundingClientRect();
+        const x = ((clientX - rect.left) / rect.width) * 100;
+        const y = ((clientY - rect.top) / rect.height) * 100;
+        return [x, y];
+      }
+
+      function showTracingError(msg) {
+        DOM.feedbackBanner.textContent = msg;
+        DOM.feedbackBanner.classList.remove('opacity-0');
+        DOM.canvasBox.classList.remove('animate-shake');
+        void DOM.canvasBox.offsetWidth;
+        DOM.canvasBox.classList.add('animate-shake');
+        AppState.errorFlashAlpha = 0.25;
+
+        if (feedbackTimer) clearTimeout(feedbackTimer);
+        feedbackTimer = setTimeout(() => {
+          DOM.feedbackBanner.classList.add('opacity-0');
+        }, 1800);
+      }
+
+      function drawPolyline(points, color, lineWidth, alpha = 1, dashed = false) {
+        if (!points || points.length < 2) return;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        if (dashed) ctx.setLineDash([lineWidth * 0.8, lineWidth * 1.1]);
+
+        ctx.beginPath();
+        const [sx, sy] = toCanvasPx(points[0]);
+        ctx.moveTo(sx, sy);
+        for (let i = 1; i < points.length; i++) {
+          const [px, py] = toCanvasPx(points[i]);
+          ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawDirectionalArrow(points, color) {
+        if (!points || points.length < 4) return;
+        // Ambil titik sekitar 35% - 55% jalur untuk panah arah penulisan
+        const idxA = Math.min(points.length - 2, Math.max(1, Math.floor(points.length * 0.32)));
+        const idxB = Math.min(points.length - 1, idxA + Math.max(2, Math.floor(points.length * 0.14)));
+        const [x1, y1] = toCanvasPx(points[idxA]);
+        const [x2, y2] = toCanvasPx(points[idxB]);
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const headLen = Math.max(10, canvasLogicalSize * 0.032);
+
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = Math.max(2.5, canvasLogicalSize * 0.008);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawStartPointBadge(pt, number, themeColor, pulsePhase) {
+        const [cx, cy] = toCanvasPx(pt);
+        const baseR = Math.max(11, canvasLogicalSize * 0.035);
+        const pulseR = baseR + Math.sin(pulsePhase) * (baseR * 0.28);
+
+        ctx.save();
+        // Lingkaran denyut luar (pulsing ring)
+        ctx.beginPath();
+        ctx.arc(cx, cy, pulseR + 4, 0, Math.PI * 2);
+        ctx.fillStyle = themeColor;
+        ctx.globalAlpha = 0.22;
+        ctx.fill();
+
+        // Lingkaran utama bernomor
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseR, 0, Math.PI * 2);
+        ctx.fillStyle = themeColor;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.stroke();
+
+        // Nomor urutan goresan (1, 2, 3...)
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `800 ${Math.round(baseR * 1.15)}px Inter, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(number), cx, cy + 0.5);
+        ctx.restore();
+      }
+
+      function renderTracingCanvas() {
+        const S = canvasLogicalSize;
+        const themePrimary = AppState.script === 'hiragana' ? '#1E3A8A' : '#C2410C';
+        const themeTint = AppState.script === 'hiragana' ? 'rgba(30, 58, 138, 0.14)' : 'rgba(194, 65, 12, 0.14)';
+        const strokeWidth = Math.max(12, S * 0.056);
+
+        ctx.clearRect(0, 0, S, S);
+
+        // 1. Latar Belakang Kertas Latihan Genkouyoushi
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, S, S);
+
+        // Kilatan merah lembut jika terjadi kesalahan goresan
+        if (AppState.errorFlashAlpha > 0.005) {
+          ctx.fillStyle = `rgba(220, 38, 38, ${AppState.errorFlashAlpha})`;
+          ctx.fillRect(0, 0, S, S);
+          AppState.errorFlashAlpha *= 0.88;
+        }
+
+        // Garis bantu kuadran Genkouyoushi (vertikal & horizontal tengah putus-putus)
+        ctx.save();
+        ctx.strokeStyle = '#E2E8F0';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 6]);
+
+        ctx.beginPath();
+        ctx.moveTo(S / 2, 12);
+        ctx.lineTo(S / 2, S - 12);
+        ctx.moveTo(12, S / 2);
+        ctx.lineTo(S - 12, S / 2);
+        ctx.stroke();
+
+        // Bingkai dalam tipis
+        ctx.setLineDash([]);
+        ctx.strokeStyle = '#F1F5F9';
+        ctx.strokeRect(14, 14, S - 28, S - 28);
+        ctx.restore();
+
+        const scriptData = getActiveScriptData();
+        const strokes = scriptData.smoothStrokes;
+
+        // 2. Mode Animasi Contoh Tulis (Demo Kakijun)
+        if (AppState.isAnimatingDemo) {
+          // Bayangan tipis semua goresan
+          strokes.forEach(st => drawPolyline(st, '#E2E8F0', strokeWidth, 1));
+
+          // Goresan demo yang sudah selesai
+          for (let i = 0; i < AppState.demoStrokeIdx; i++) {
+            drawPolyline(strokes[i], themePrimary, strokeWidth, 1);
+          }
+
+          // Goresan demo yang sedang bergerak
+          if (AppState.demoStrokeIdx < strokes.length) {
+            const activeDemoStroke = strokes[AppState.demoStrokeIdx];
+            const slice = activeDemoStroke.slice(0, AppState.demoPointIdx + 1);
+            drawPolyline(slice, themePrimary, strokeWidth, 1);
+
+            const tip = slice[slice.length - 1] || activeDemoStroke[0];
+            drawStartPointBadge(tip, AppState.demoStrokeIdx + 1, themePrimary, 0);
+          }
+          return;
+        }
+
+        // 3. Bayangan Huruf Standar (Ghost Guide) -> Disembunyikan pada Mode Uji!
+        if (AppState.subMode === 'practice') {
+          strokes.forEach((st, idx) => {
+            if (idx >= AppState.completedStrokes) {
+              drawPolyline(st, '#E2E8F0', strokeWidth, 1);
+            }
+          });
+        }
+
+        // 4. Goresan yang Sudah Selesai Ditulis Siswa (Clean Uniform Rounded Pen)
+        for (let i = 0; i < AppState.completedStrokes; i++) {
+          drawPolyline(strokes[i], themePrimary, strokeWidth, 1);
+        }
+
+        // 5. Panduan Goresan Aktif & Jejak Pena Siswa
+        if (AppState.completedStrokes < strokes.length) {
+          const activeStroke = strokes[AppState.completedStrokes];
+
+          if (AppState.subMode === 'practice') {
+            // Sorotan lembut jalur aktif + panah arah
+            drawPolyline(activeStroke, themeTint, strokeWidth * 1.08, 1);
+            drawDirectionalArrow(activeStroke, themePrimary);
+          }
+
+          // Jejak pena siswa saat sedang menggores
+          if (AppState.userTrail.length > 1) {
+            drawPolyline(AppState.userTrail, themePrimary, strokeWidth, 0.95);
+          }
+
+          // Lingkaran bernomor urutan (1, 2, 3...) dengan animasi denyut di titik awal
+          drawStartPointBadge(
+            activeStroke[0],
+            AppState.completedStrokes + 1,
+            themePrimary,
+            AppState.pulsePhase
+          );
+        }
+      }
+
+      /* ======================================================================
+         G. INTERAKSI POINTER EVENTS UNTUK TRACING PRESISI TINGGI
+         ====================================================================== */
+      function resetCurrentStrokeAttempt() {
+        AppState.isDrawing = false;
+        AppState.activeProgressIdx = 0;
+        AppState.userTrail = [];
+      }
+
+      function handleCanvasPointerDown(e) {
+        if (AppState.isAnimatingDemo) return;
+        const scriptData = getActiveScriptData();
+        const strokes = scriptData.smoothStrokes;
+        if (AppState.completedStrokes >= strokes.length) return;
+
+        e.preventDefault();
+        DOM.canvas.setPointerCapture(e.pointerId);
+
+        const pt = toNormCoords(e.clientX, e.clientY);
+        const activeStroke = strokes[AppState.completedStrokes];
+        const startPt = activeStroke[0];
+
+        // Toleransi titik awal: ~13% dari lebar kanvas agar nyaman disentuh jari di HP
+        const startTolerance = 13.5;
+        if (distance2D(pt, startPt) <= startTolerance) {
+          AppState.isDrawing = true;
+          AppState.activeProgressIdx = 0;
+          AppState.userTrail = [startPt, pt];
+        } else {
+          SoundEngine.playStrokeError();
+          showTracingError(`Mulai dari titik nomor ${AppState.completedStrokes + 1}`);
+        }
+      }
+
+      function handleCanvasPointerMove(e) {
+        if (!AppState.isDrawing || AppState.isAnimatingDemo) return;
+        e.preventDefault();
+
+        const scriptData = getActiveScriptData();
+        const activeStroke = scriptData.smoothStrokes[AppState.completedStrokes];
+        if (!activeStroke) return;
+
+        const pt = toNormCoords(e.clientX, e.clientY);
+
+        // Toleransi jalur proporsional (~8% dari ukuran kanvas)
+        const pathTolerance = 8.2;
+
+        // Cari titik terdekat dalam jendela maju (strict forward progression!)
+        const lookahead = Math.max(14, Math.floor(activeStroke.length * 0.28));
+        const maxSearchIdx = Math.min(activeStroke.length - 1, AppState.activeProgressIdx + lookahead);
+
+        let bestIdx = AppState.activeProgressIdx;
+        let minDist = Infinity;
+
+        for (let i = AppState.activeProgressIdx; i <= maxSearchIdx; i++) {
+          const d = distance2D(pt, activeStroke[i]);
+          if (d < minDist) {
+            minDist = d;
+            bestIdx = i;
+          }
+        }
+
+        // Cek apakah pengguna keluar dari jalur toleransi
+        if (minDist > pathTolerance) {
+          SoundEngine.playStrokeError();
+          resetCurrentStrokeAttempt();
+          showTracingError(`Perhatikan urutan & arah goresan ke-${AppState.completedStrokes + 1}`);
+          return;
+        }
+
+        AppState.activeProgressIdx = bestIdx;
+        AppState.userTrail.push(pt);
+      }
+
+      function handleCanvasPointerUp(e) {
+        if (!AppState.isDrawing) return;
+        e.preventDefault();
+
+        const scriptData = getActiveScriptData();
+        const strokes = scriptData.smoothStrokes;
+        const activeStroke = strokes[AppState.completedStrokes];
+
+        // Cek apakah goresan sudah mencapai minimal 88% panjang jalur
+        const completionRatio = (AppState.activeProgressIdx + 1) / activeStroke.length;
+
+        if (completionRatio >= 0.88) {
+          const finishedStrokeIdx = AppState.completedStrokes;
+          AppState.completedStrokes++;
+          resetCurrentStrokeAttempt();
+          updateTracingInfoUI();
+
+          if (AppState.completedStrokes >= strokes.length) {
+            // Seluruh goresan huruf selesai!
+            onTracingCharacterCompleted();
+          } else {
+            SoundEngine.playStrokeSuccess(finishedStrokeIdx);
+          }
+        } else {
+          // Goresan terputus sebelum mencapai ujung
+          SoundEngine.playStrokeError();
+          resetCurrentStrokeAttempt();
+          showTracingError(`Tarik goresan ke-${AppState.completedStrokes + 1} sampai ujung panah`);
+        }
+      }
+
+      function onTracingCharacterCompleted() {
+        const entry = getActiveEntry();
+        const scriptData = getActiveScriptData(entry);
+
+        if (AppState.script === 'hiragana') {
+          AppState.tracedHiragana.add(entry.id);
+        } else {
+          AppState.tracedKatakana.add(entry.id);
+        }
+        persistProgress();
+        updateTracingInfoUI();
+
+        // Tampilkan stempel「よくできました！」
+        DOM.stampOverlay.classList.remove('hidden');
+        DOM.stampCard.classList.remove('animate-stamp');
+        void DOM.stampCard.offsetWidth;
+        DOM.stampCard.classList.add('animate-stamp');
+
+        SoundEngine.playCharacterComplete();
+        setTimeout(() => {
+          SoundEngine.speakJapanese(scriptData.char);
+        }, 350);
+      }
+
+      function startDemoAnimation() {
+        if (AppState.isAnimatingDemo) return;
+        resetCurrentStrokeAttempt();
+        DOM.stampOverlay.classList.add('hidden');
+        AppState.isAnimatingDemo = true;
+        AppState.demoStrokeIdx = 0;
+        AppState.demoPointIdx = 0;
+        DOM.btnTracingDemo.disabled = true;
+        DOM.btnTracingDemo.classList.add('opacity-60');
+      }
+
+      function clearTracingCanvas() {
+        AppState.isAnimatingDemo = false;
+        DOM.btnTracingDemo.disabled = false;
+        DOM.btnTracingDemo.classList.remove('opacity-60');
+        AppState.completedStrokes = 0;
+        resetCurrentStrokeAttempt();
+        DOM.stampOverlay.classList.add('hidden');
+        DOM.feedbackBanner.classList.add('opacity-0');
+        updateTracingInfoUI();
+      }
+
+      /* ======================================================================
+         H. SINKRONISASI UI MODE TRACING
+         ====================================================================== */
+      function updateTracingInfoUI() {
+        const entry = getActiveEntry();
+        const scriptData = getActiveScriptData(entry);
+        const totalStrokes = scriptData.strokes.length;
+        const isHiragana = AppState.script === 'hiragana';
+
+        DOM.tracingScriptBadge.textContent = isHiragana ? 'HIRAGANA' : 'KATAKANA';
+        DOM.tracingScriptDesc.textContent = isHiragana
+          ? 'Aksara Dasar & Kosakata Asli Jepang'
+          : 'Aksara Kata Serapan Asing (Gairaigo)';
+        DOM.tracingCounterBadge.textContent = `${AppState.currentIndex + 1} / ${KANA_DATABASE.length}`;
+
+        DOM.tracingCharPreview.textContent = scriptData.char;
+        DOM.tracingRomaji.textContent = entry.romaji;
+
+        const currentStrokeLabel = AppState.completedStrokes < totalStrokes
+          ? `Goresan ${AppState.completedStrokes + 1}/${totalStrokes}`
+          : 'Selesai!';
+        DOM.tracingStrokeInfo.innerHTML = `${entry.rowName} • <span class="text-theme-primary font-bold">${totalStrokes} Goresan</span> (${currentStrokeLabel})`;
+
+        DOM.tracingVocabJp.textContent = scriptData.word;
+        DOM.tracingVocabMeaning.innerHTML = `<span class="font-semibold italic text-slate-700">${scriptData.wordRomaji}</span> — ${scriptData.meaning}`;
+
+        // Lencana Selesai Ditulis
+        const tracedSet = isHiragana ? AppState.tracedHiragana : AppState.tracedKatakana;
+        if (tracedSet.has(entry.id)) {
+          DOM.tracingMasteredPill.classList.remove('hidden');
+        } else {
+          DOM.tracingMasteredPill.classList.add('hidden');
+        }
+
+        // Progres Baris & Total
+        const count = tracedSet.size;
+        const pct = Math.round((count / KANA_DATABASE.length) * 100);
+        DOM.tracingProgressLabel.textContent = isHiragana
+          ? 'Progres Menulis Hiragana'
+          : 'Progres Menulis Katakana';
+        DOM.tracingProgressCount.textContent = `${count} / ${KANA_DATABASE.length} Huruf`;
+        DOM.tracingProgressBar.style.width = `${pct}%`;
+
+        // Sub-mode Latihan vs Uji
+        if (AppState.subMode === 'practice') {
+          DOM.btnSubmodePractice.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-theme-primary text-white shadow-2xs transition cursor-pointer';
+          DOM.btnSubmodeTest.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer';
+        } else {
+          DOM.btnSubmodePractice.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer';
+          DOM.btnSubmodeTest.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-theme-primary text-white shadow-2xs transition cursor-pointer';
+        }
+      }
+
+      function selectCharacterByIndex(index, autoPlayAudio = false) {
+        const len = KANA_DATABASE.length;
+        AppState.currentIndex = ((index % len) + len) % len;
+        clearTracingCanvas();
+        if (autoPlayAudio) {
+          SoundEngine.speakJapanese(getActiveScriptData().char);
+        }
+      }
+
+      /* ======================================================================
+         I. LOGIKA MODE 2: FLASHCARD KANA 3D & SWIPE GESTURE
+         ====================================================================== */
+      function buildFlashcardRowFilters() {
+        DOM.fcRowFilters.innerHTML = '';
+        ROW_DEFS.forEach(r => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.rowId = r.id;
+          const active = AppState.fcRowFilter === r.id;
+          btn.className = active
+            ? 'shrink-0 px-3 py-1 rounded-full text-xs font-extrabold bg-theme-primary text-white shadow-2xs transition cursor-pointer'
+            : 'shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer';
+          btn.textContent = r.short;
+          btn.addEventListener('click', () => {
+            AppState.fcRowFilter = r.id;
+            rebuildFlashcardDeck(false);
+          });
+          DOM.fcRowFilters.appendChild(btn);
+        });
+      }
+
+      function rebuildFlashcardDeck(shuffle = false) {
+        let indices = [];
+        KANA_DATABASE.forEach((item, idx) => {
+          if (AppState.fcRowFilter === 'all' || item.row === AppState.fcRowFilter) {
+            indices.push(idx);
+          }
+        });
+        if (indices.length === 0) indices = KANA_DATABASE.map((_, idx) => idx);
+
+        if (shuffle) {
+          for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+          }
+        }
+
+        AppState.fcDeckIndices = indices;
+        AppState.fcDeckPos = 0;
+        AppState.fcFlipped = false;
+        DOM.flashcardInner.classList.remove('is-flipped');
+
+        buildFlashcardRowFilters();
+        renderFlashcardUI();
+      }
+
+      function renderMiniStrokeDiagram(scriptData) {
+        const c = DOM.fcMiniStrokeCanvas;
+        const mctx = c.getContext('2d');
+        const S = 120;
+        mctx.clearRect(0, 0, S, S);
+
+        const themePrimary = AppState.script === 'hiragana' ? '#1E3A8A' : '#C2410C';
+
+        // Garis bantu tipis
+        mctx.strokeStyle = '#E2E8F0';
+        mctx.lineWidth = 1;
+        mctx.setLineDash([3, 3]);
+        mctx.beginPath();
+        mctx.moveTo(S / 2, 6);
+        mctx.lineTo(S / 2, S - 6);
+        mctx.moveTo(6, S / 2);
+        mctx.lineTo(S - 6, S / 2);
+        mctx.stroke();
+        mctx.setLineDash([]);
+
+        // Gambar goresan
+        scriptData.smoothStrokes.forEach((st, idx) => {
+          mctx.strokeStyle = idx === 0 ? themePrimary : '#475569';
+          mctx.lineWidth = 5;
+          mctx.lineCap = 'round';
+          mctx.lineJoin = 'round';
+          mctx.beginPath();
+          st.forEach((pt, pIdx) => {
+            const x = (pt[0] / 100) * S;
+            const y = (pt[1] / 100) * S;
+            if (pIdx === 0) mctx.moveTo(x, y);
+            else mctx.lineTo(x, y);
+          });
+          mctx.stroke();
+
+          // Titik awal bernomor kecil
+          const [sx, sy] = [(st[0][0] / 100) * S, (st[0][1] / 100) * S];
+          mctx.fillStyle = themePrimary;
+          mctx.beginPath();
+          mctx.arc(sx, sy, 8.5, 0, Math.PI * 2);
+          mctx.fill();
+
+          mctx.fillStyle = '#FFFFFF';
+          mctx.font = 'bold 10px Inter, sans-serif';
+          mctx.textAlign = 'center';
+          mctx.textBaseline = 'middle';
+          mctx.fillText(String(idx + 1), sx, sy + 0.5);
+        });
+      }
+
+      function renderFlashcardUI() {
+        const dbIdx = AppState.fcDeckIndices[AppState.fcDeckPos] ?? 0;
+        const entry = KANA_DATABASE[dbIdx];
+        const scriptData = getActiveScriptData(entry);
+        const isHiragana = AppState.script === 'hiragana';
+        const masteredSet = isHiragana ? AppState.masteredHiragana : AppState.masteredKatakana;
+
+        // Sisi Depan
+        DOM.fcFrontBadge.textContent = `${isHiragana ? 'HIRAGANA' : 'KATAKANA'} • ${entry.rowName}`;
+        DOM.fcCardIndex.textContent = `${AppState.fcDeckPos + 1} / ${AppState.fcDeckIndices.length}`;
+        DOM.fcFrontChar.textContent = scriptData.char;
+
+        if (masteredSet.has(entry.id)) {
+          DOM.fcMasteredBadge.classList.remove('hidden');
+        } else {
+          DOM.fcMasteredBadge.classList.add('hidden');
+        }
+
+        // Sisi Belakang
+        DOM.fcBackRomaji.textContent = entry.romaji;
+        DOM.fcBackMeta.textContent = `${isHiragana ? 'Hiragana' : 'Katakana'} • ${scriptData.strokes.length} Goresan`;
+        DOM.fcBackVocabJp.textContent = scriptData.word;
+        DOM.fcBackVocabMeaning.innerHTML = `<span class="font-bold italic text-slate-800">${scriptData.wordRomaji}</span> — ${scriptData.meaning}`;
+        renderMiniStrokeDiagram(scriptData);
+
+        // Panel Samping & Progres Hafalan Dek
+        DOM.fcSideScriptLabel.textContent = isHiragana ? 'DEK HIRAGANA (46 KARTU)' : 'DEK KATAKANA (46 KARTU)';
+        DOM.fcSideScriptDesc.textContent = isHiragana
+          ? 'Aksara Dasar & Kosakata Asli Jepang'
+          : 'Aksara Kata Serapan Asing (Gairaigo)';
+
+        const masteredCount = masteredSet.size;
+        const pct = Math.round((masteredCount / KANA_DATABASE.length) * 100);
+        DOM.fcProgressText.textContent = `Progres ${isHiragana ? 'Hiragana' : 'Katakana'}: ${masteredCount}/${KANA_DATABASE.length} Hafal`;
+        DOM.fcProgressBar.style.width = `${pct}%`;
+      }
+
+      function flipFlashcard() {
+        AppState.fcFlipped = !AppState.fcFlipped;
+        DOM.flashcardInner.classList.toggle('is-flipped', AppState.fcFlipped);
+        SoundEngine.playCardFlip();
+      }
+
+      function navigateFlashcard(delta) {
+        const len = AppState.fcDeckIndices.length;
+        AppState.fcDeckPos = ((AppState.fcDeckPos + delta) % len + len) % len;
+        AppState.fcFlipped = false;
+        DOM.flashcardInner.classList.remove('is-flipped');
+        renderFlashcardUI();
+      }
+
+      function setFlashcardMastery(isMastered) {
+        const dbIdx = AppState.fcDeckIndices[AppState.fcDeckPos] ?? 0;
+        const entry = KANA_DATABASE[dbIdx];
+        const masteredSet = AppState.script === 'hiragana'
+          ? AppState.masteredHiragana
+          : AppState.masteredKatakana;
+
+        if (isMastered) {
+          masteredSet.add(entry.id);
+          SoundEngine.playStrokeSuccess(2);
+        } else {
+          masteredSet.delete(entry.id);
+          SoundEngine.playStrokeError();
+        }
+        persistProgress();
+        renderFlashcardUI();
+
+        // Otomatis maju ke kartu berikutnya agar belajar mengalir cepat
+        setTimeout(() => navigateFlashcard(1), 220);
+      }
+
+      // Dukungan Gestur Swipe Kiri/Kanan + Ketuk Flip pada Kartu Flashcard
+      let fcPointerStart = null;
+      DOM.flashcardScene.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('button')) return;
+        fcPointerStart = { x: e.clientX, y: e.clientY, time: Date.now() };
+      });
+
+      DOM.flashcardScene.addEventListener('pointermove', (e) => {
+        if (!fcPointerStart) return;
+        const dx = e.clientX - fcPointerStart.x;
+        if (Math.abs(dx) > 12) {
+          const rot = Math.max(-10, Math.min(10, dx * 0.04));
+          DOM.flashcardScene.style.transform = `translateX(${dx * 0.25}px) rotate(${rot}deg)`;
+        }
+      });
+
+      DOM.flashcardScene.addEventListener('pointerup', (e) => {
+        if (!fcPointerStart) return;
+        const dx = e.clientX - fcPointerStart.x;
+        const dy = e.clientY - fcPointerStart.y;
+        DOM.flashcardScene.style.transform = '';
+        fcPointerStart = null;
+
+        if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
+          // Swipe kiri -> kartu berikutnya; swipe kanan -> kartu sebelumnya
+          if (dx < 0) navigateFlashcard(1);
+          else navigateFlashcard(-1);
+        } else if (Math.abs(dx) < 14 && Math.abs(dy) < 14) {
+          flipFlashcard();
+        }
+      });
+
+      DOM.flashcardScene.addEventListener('pointercancel', () => {
+        DOM.flashcardScene.style.transform = '';
+        fcPointerStart = null;
+      });
+
+      /* ======================================================================
+         J. MODAL TABEL GOJUON LENGKAP (5x10 INTERAKTIF)
+         ====================================================================== */
+      function renderGojuonModalGrid() {
+        const isHiragana = AppState.modalScript === 'hiragana';
+        const tracedSet = isHiragana ? AppState.tracedHiragana : AppState.tracedKatakana;
+        const masteredSet = isHiragana ? AppState.masteredHiragana : AppState.masteredKatakana;
+
+        // Update tab style di dalam modal
+        DOM.btnModalTabHiragana.className = isHiragana
+          ? 'px-3 py-1 rounded-lg text-xs font-extrabold bg-[#1E3A8A] text-white shadow-2xs transition cursor-pointer'
+          : 'px-3 py-1 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition cursor-pointer';
+        DOM.btnModalTabKatakana.className = !isHiragana
+          ? 'px-3 py-1 rounded-lg text-xs font-extrabold bg-[#C2410C] text-white shadow-2xs transition cursor-pointer'
+          : 'px-3 py-1 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition cursor-pointer';
+
+        DOM.gojuonGridContainer.innerHTML = '';
+
+        // Header kolom vokal (A, I, U, E, O)
+        const headerRow = document.createElement('div');
+        headerRow.className = 'grid grid-cols-6 gap-1.5 sm:gap-2 text-center text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-1';
+        headerRow.innerHTML = `
+          <div class="text-left">Baris</div>
+          <div>A</div>
+          <div>I</div>
+          <div>U</div>
+          <div>E</div>
+          <div>O</div>
+        `;
+        DOM.gojuonGridContainer.appendChild(headerRow);
+
+        const rows = ROW_DEFS.filter(r => r.id !== 'all');
+        rows.forEach(r => {
+          const rowEl = document.createElement('div');
+          rowEl.className = 'grid grid-cols-6 gap-1.5 sm:gap-2 items-stretch';
+
+          // Label baris
+          const labelCell = document.createElement('div');
+          labelCell.className = 'flex items-center text-[11px] sm:text-xs font-bold text-slate-500 pl-1';
+          labelCell.textContent = r.short;
+          rowEl.appendChild(labelCell);
+
+          const itemsInRow = KANA_DATABASE
+            .map((entry, idx) => ({ entry, idx }))
+            .filter(obj => obj.entry.row === r.id);
+
+          for (let col = 0; col < 5; col++) {
+            const match = itemsInRow.find(obj => obj.entry.vowelCol === col);
+            if (!match) {
+              const emptyCell = document.createElement('div');
+              emptyCell.className = 'rounded-2xl bg-slate-100/60 border border-dashed border-slate-200 min-h-[54px]';
+              rowEl.appendChild(emptyCell);
+              continue;
+            }
+
+            const { entry, idx } = match;
+            const sData = isHiragana ? entry.hiragana : entry.katakana;
+            const isTraced = tracedSet.has(entry.id);
+            const isMastered = masteredSet.has(entry.id);
+            const isCurrent = idx === AppState.currentIndex && AppState.script === AppState.modalScript;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `relative rounded-2xl p-1.5 sm:p-2 border text-center flex flex-col items-center justify-center transition active:scale-95 cursor-pointer ${
+              isCurrent
+                ? (isHiragana ? 'bg-blue-50 border-[#1E3A8A] ring-2 ring-[#1E3A8A]/30' : 'bg-orange-50 border-[#C2410C] ring-2 ring-[#C2410C]/30')
+                : 'bg-white hover:bg-slate-50 border-slate-200'
+            }`;
+
+            btn.innerHTML = `
+              <div class="absolute top-1 right-1 flex gap-0.5">
+                ${isTraced ? '<span class="w-2 h-2 rounded-full bg-blue-600" title="Tulis Selesai"></span>' : ''}
+                ${isMastered ? '<span class="w-2 h-2 rounded-full bg-emerald-500" title="Hafal"></span>' : ''}
+              </div>
+              <span class="jp-font text-lg sm:text-2xl font-bold text-slate-800 leading-tight">${sData.char}</span>
+              <span class="text-[10px] sm:text-xs font-bold text-slate-500">${entry.romaji}</span>
+            `;
+
+            btn.addEventListener('click', () => {
+              // Sinkronkan jenis aksara dan lompat ke huruf yang dipilih
+              setActiveScript(AppState.modalScript);
+              AppState.currentIndex = idx;
+              clearTracingCanvas();
+
+              // Sinkronkan juga posisi pada flashcard
+              AppState.fcRowFilter = 'all';
+              AppState.fcDeckIndices = KANA_DATABASE.map((_, i) => i);
+              AppState.fcDeckPos = idx;
+              AppState.fcFlipped = false;
+              DOM.flashcardInner.classList.remove('is-flipped');
+              buildFlashcardRowFilters();
+              renderFlashcardUI();
+
+              DOM.modalGojuon.classList.add('hidden');
+              SoundEngine.speakJapanese(sData.char);
+              if (AppState.mode === 'tracing') {
+                setTimeout(resizeTracingCanvas, 30);
+              }
+            });
+
+            rowEl.appendChild(btn);
+          }
+
+          DOM.gojuonGridContainer.appendChild(rowEl);
+        });
+      }
+
+      /* ======================================================================
+         K. PENGATUR MODE UTAMA & TEMA VISUAL (HIRAGANA VS KATAKANA)
+         ====================================================================== */
+      function setActiveMode(newMode) {
+        AppState.mode = newMode;
+        const isTracing = newMode === 'tracing';
+
+        DOM.viewTracing.classList.toggle('hidden', !isTracing);
+        DOM.viewFlashcard.classList.toggle('hidden', isTracing);
+
+        DOM.btnModeTracing.className = isTracing
+          ? 'px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 bg-white text-slate-900 shadow-xs transition-all cursor-pointer'
+          : 'px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-all cursor-pointer';
+
+        DOM.btnModeFlashcard.className = !isTracing
+          ? 'px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 bg-white text-slate-900 shadow-xs transition-all cursor-pointer'
+          : 'px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-all cursor-pointer';
+
+        if (isTracing) {
+          setTimeout(resizeTracingCanvas, 20);
+        } else {
+          renderFlashcardUI();
+        }
+      }
+
+      function setActiveScript(newScript) {
+        AppState.script = newScript;
+        const isHiragana = newScript === 'hiragana';
+
+        DOM.body.classList.toggle('theme-katakana', !isHiragana);
+
+        DOM.btnScriptHiragana.className = isHiragana
+          ? 'px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold flex items-center gap-1.5 bg-[#1E3A8A] text-white shadow-xs transition-all cursor-pointer'
+          : 'px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-all cursor-pointer';
+
+        DOM.btnScriptKatakana.className = !isHiragana
+          ? 'px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold flex items-center gap-1.5 bg-[#C2410C] text-white shadow-xs transition-all cursor-pointer'
+          : 'px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-all cursor-pointer';
+
+        // Reset state kanvas & kartu ke aksara baru dengan mulus
+        clearTracingCanvas();
+        AppState.fcFlipped = false;
+        DOM.flashcardInner.classList.remove('is-flipped');
+        buildFlashcardRowFilters();
+        renderFlashcardUI();
+        if (AppState.mode === 'tracing') renderTracingCanvas();
+      }
+
+      /* ======================================================================
+         L. LOOP ANIMASI REAL-TIME (DENYUT START POINT & DEMO KAKIJUN)
+         ====================================================================== */
+      let lastFrameTime = 0;
+
+      function animationLoop(timestamp) {
+        if (!lastFrameTime) lastFrameTime = timestamp;
+        const dt = (timestamp - lastFrameTime) / 1000;
+        lastFrameTime = timestamp;
+
+        AppState.pulsePhase += dt * 4.5;
+
+        if (AppState.isAnimatingDemo) {
+          const strokes = getActiveScriptData().smoothStrokes;
+          if (AppState.demoStrokeIdx < strokes.length) {
+            const activeDemo = strokes[AppState.demoStrokeIdx];
+            // Kecepatan animasi tulis yang jelas dan enak diamati siswa
+            AppState.demoPointIdx += Math.max(1, Math.round(dt * 42));
+            if (AppState.demoPointIdx >= activeDemo.length) {
+              SoundEngine.playStrokeSuccess(AppState.demoStrokeIdx);
+              AppState.demoStrokeIdx++;
+              AppState.demoPointIdx = 0;
+            }
+          } else {
+            AppState.isAnimatingDemo = false;
+            DOM.btnTracingDemo.disabled = false;
+            DOM.btnTracingDemo.classList.remove('opacity-60');
+            SoundEngine.speakJapanese(getActiveScriptData().char);
+          }
+        }
+
+        if (AppState.mode === 'tracing') {
+          renderTracingCanvas();
+        }
+
+        requestAnimationFrame(animationLoop);
+      }
+
+      /* ======================================================================
+         M. PENDAFTARAN EVENT LISTENER & INISIALISASI
+         ====================================================================== */
+      function bindEvents() {
+        // Sakelar Mode & Aksara
+        DOM.btnModeTracing.addEventListener('click', () => setActiveMode('tracing'));
+        DOM.btnModeFlashcard.addEventListener('click', () => setActiveMode('flashcard'));
+        DOM.btnScriptHiragana.addEventListener('click', () => setActiveScript('hiragana'));
+        DOM.btnScriptKatakana.addEventListener('click', () => setActiveScript('katakana'));
+
+        // Audio & Fullscreen
+        DOM.btnToggleAudio.addEventListener('click', () => {
+          SoundEngine.muted = !SoundEngine.muted;
+          DOM.iconAudioOn.classList.toggle('hidden', SoundEngine.muted);
+          DOM.iconAudioOff.classList.toggle('hidden', !SoundEngine.muted);
+        });
+
+        DOM.btnToggleFullscreen.addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen?.().catch(() => {});
+          } else {
+            document.exitFullscreen?.().catch(() => {});
+          }
+        });
+
+        // Tracing Pointer Events
+        DOM.canvas.addEventListener('pointerdown', handleCanvasPointerDown);
+        DOM.canvas.addEventListener('pointermove', handleCanvasPointerMove);
+        DOM.canvas.addEventListener('pointerup', handleCanvasPointerUp);
+        DOM.canvas.addEventListener('pointercancel', resetCurrentStrokeAttempt);
+
+        // Tracing Controls
+        DOM.btnTracingSpeak.addEventListener('click', () => SoundEngine.speakJapanese(getActiveScriptData().char));
+        DOM.btnTracingSpeakVocab.addEventListener('click', () => SoundEngine.speakJapanese(getActiveScriptData().word));
+        DOM.btnSubmodePractice.addEventListener('click', () => {
+          AppState.subMode = 'practice';
+          updateTracingInfoUI();
+          renderTracingCanvas();
+        });
+        DOM.btnSubmodeTest.addEventListener('click', () => {
+          AppState.subMode = 'test';
+          updateTracingInfoUI();
+          renderTracingCanvas();
+        });
+        DOM.btnTracingDemo.addEventListener('click', startDemoAnimation);
+        DOM.btnTracingClear.addEventListener('click', clearTracingCanvas);
+        DOM.btnTracingPrev.addEventListener('click', () => selectCharacterByIndex(AppState.currentIndex - 1));
+        DOM.btnTracingNext.addEventListener('click', () => selectCharacterByIndex(AppState.currentIndex + 1));
+
+        // Flashcard Controls
+        DOM.btnFcSpeakFront.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const dbIdx = AppState.fcDeckIndices[AppState.fcDeckPos] ?? 0;
+          SoundEngine.speakJapanese(getActiveScriptData(KANA_DATABASE[dbIdx]).char);
+        });
+        DOM.btnFcSpeakVocab.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const dbIdx = AppState.fcDeckIndices[AppState.fcDeckPos] ?? 0;
+          SoundEngine.speakJapanese(getActiveScriptData(KANA_DATABASE[dbIdx]).word);
+        });
+        DOM.btnFcGoTracing.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const dbIdx = AppState.fcDeckIndices[AppState.fcDeckPos] ?? 0;
+          AppState.currentIndex = dbIdx;
+          clearTracingCanvas();
+          setActiveMode('tracing');
+        });
+        DOM.btnFcUnmastered.addEventListener('click', () => setFlashcardMastery(false));
+        DOM.btnFcMastered.addEventListener('click', () => setFlashcardMastery(true));
+        DOM.btnFcPrev.addEventListener('click', () => navigateFlashcard(-1));
+        DOM.btnFcNext.addEventListener('click', () => navigateFlashcard(1));
+        DOM.btnFcShuffle.addEventListener('click', () => {
+          SoundEngine.playCardFlip();
+          rebuildFlashcardDeck(true);
+        });
+
+        // Modal Reset Progres Flashcard
+        DOM.btnFcResetPrompt.addEventListener('click', () => {
+          const label = AppState.script === 'hiragana' ? 'Hiragana' : 'Katakana';
+          DOM.resetConfirmDesc.textContent = `Semua status "Sudah Hafal" pada dek ${label} akan dikembalikan menjadi belum hafal.`;
+          DOM.modalResetConfirm.classList.remove('hidden');
+        });
+        DOM.btnCancelReset.addEventListener('click', () => DOM.modalResetConfirm.classList.add('hidden'));
+        DOM.btnConfirmReset.addEventListener('click', () => {
+          if (AppState.script === 'hiragana') {
+            AppState.masteredHiragana.clear();
+          } else {
+            AppState.masteredKatakana.clear();
+          }
+          persistProgress();
+          renderFlashcardUI();
+          DOM.modalResetConfirm.classList.add('hidden');
+        });
+
+        // Modal Gojuon
+        DOM.btnOpenGojuon.addEventListener('click', () => {
+          AppState.modalScript = AppState.script;
+          renderGojuonModalGrid();
+          DOM.modalGojuon.classList.remove('hidden');
+        });
+        DOM.btnCloseGojuon.addEventListener('click', () => DOM.modalGojuon.classList.add('hidden'));
+        DOM.modalGojuon.addEventListener('click', (e) => {
+          if (e.target === DOM.modalGojuon) DOM.modalGojuon.classList.add('hidden');
+        });
+        DOM.btnModalTabHiragana.addEventListener('click', () => {
+          AppState.modalScript = 'hiragana';
+          renderGojuonModalGrid();
+        });
+        DOM.btnModalTabKatakana.addEventListener('click', () => {
+          AppState.modalScript = 'katakana';
+          renderGojuonModalGrid();
+        });
+
+        // Keyboard Shortcuts (Spasi flip flashcard, panah kiri/kanan navigasi)
+        window.addEventListener('keydown', (e) => {
+          if (!DOM.modalGojuon.classList.contains('hidden')) {
+            if (e.key === 'Escape') DOM.modalGojuon.classList.add('hidden');
+            return;
+          }
+          if (AppState.mode === 'flashcard') {
+            if (e.code === 'Space') {
+              e.preventDefault();
+              flipFlashcard();
+            } else if (e.key === 'ArrowRight') {
+              navigateFlashcard(1);
+            } else if (e.key === 'ArrowLeft') {
+              navigateFlashcard(-1);
+            }
+          } else if (AppState.mode === 'tracing') {
+            if (e.key === 'ArrowRight') selectCharacterByIndex(AppState.currentIndex + 1);
+            else if (e.key === 'ArrowLeft') selectCharacterByIndex(AppState.currentIndex - 1);
+          }
+        });
+
+        // ResizeObserver untuk menyesuaikan kanvas secara instan pada rotasi layar / resize
+        if ('ResizeObserver' in window) {
+          const ro = new ResizeObserver(() => resizeTracingCanvas());
+          ro.observe(DOM.canvasStageWrapper);
+        }
+        window.addEventListener('resize', resizeTracingCanvas);
+      }
+
+      window.addEventListener('load', () => {
+        bindEvents();
+        setActiveScript('hiragana');
+        setActiveMode('tracing');
+        rebuildFlashcardDeck(false);
+        resizeTracingCanvas();
+        requestAnimationFrame(animationLoop);
+      });
+    })();
+  </script>
+</body>
+</html>
